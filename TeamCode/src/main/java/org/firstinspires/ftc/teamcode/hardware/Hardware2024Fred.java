@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.hardware;
 
 //import com.arcrobotics.ftclib.controller.PIDController;
 //import com.arcrobotics.ftclib.controller.PIDFController;
+import android.util.Log;
+
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -201,6 +203,7 @@ public class Hardware2024Fred {
 
     public void freeMoveVerticalSlide(float power ) {
         double slidePosition  = vSlide.getCurrentPosition();
+        Log.d("9010", "ele position " + slidePosition);
 
         //Control  Vslide
         if ((power > 0 && slidePosition < slideUpperLimit) || (power < 0 && slidePosition > 0)) {
@@ -211,10 +214,11 @@ public class Hardware2024Fred {
 
     }
     public void elevation(float power) {
-        double slidePosition  = elevation.getCurrentPosition();
-        if ((power > 0 && slidePosition < slideUpperLimit) || (power < 0 && slidePosition > 0)) {
-            elevation.setVelocity(power * ANGULAR_RATE);
+        double elePosition   = elevation.getCurrentPosition();
+        Log.d("9010", "ele position " + elePosition);
 
+        if ((power > 0 && elePosition < slideUpperLimit) || (power < 0 && elePosition > 0)) {
+            elevation.setVelocity(power * ANGULAR_RATE);
         } else {
             elevation.setVelocity(0);
 
