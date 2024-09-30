@@ -1,21 +1,15 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
-import android.util.Log;
-import android.util.Size;
 
-import com.arcrobotics.ftclib.controller.PIDController;
-import com.arcrobotics.ftclib.controller.PIDFController;
+//import com.arcrobotics.ftclib.controller.PIDController;
+//import com.arcrobotics.ftclib.controller.PIDFController;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 public class Hardware2024Fred {
 
@@ -28,7 +22,7 @@ public class Hardware2024Fred {
     public DcMotorEx wheelFrontLeft = null;
     public DcMotorEx wheelBackRight = null;
     public DcMotorEx wheelBackLeft = null;
-    public DcMotorEx extend = null;
+    public DcMotorEx vSlide = null;
     public DcMotorEx elevation = null;
 
     //IMU
@@ -42,6 +36,8 @@ public class Hardware2024Fred {
 
     private boolean debug = true;
     private Telemetry telemetry;
+
+    private double slideUpperLimit = 2000;
 
     //PID control parameter for turning.
     private double turnKP = 0.15;
@@ -135,6 +131,7 @@ public class Hardware2024Fred {
     }
 
 
+    private int vsldieInitPosition = 0;
     /**
      * Initialize hardware.
      */
@@ -143,7 +140,8 @@ public class Hardware2024Fred {
         wheelFrontLeft = hwMap.get(DcMotorEx.class, "lfWheel");
         wheelBackRight = hwMap.get(DcMotorEx.class, "rrWheel");
         wheelBackLeft = hwMap.get(DcMotorEx.class, "lrWheel");
-
+        vSlide = hwMap.get(DcMotorEx.class, "vSlideM");
+        elevation = hwMap.get(DcMotorEx.class, "elev");
 
         wheelFrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         wheelBackLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -159,17 +157,22 @@ public class Hardware2024Fred {
         wheelFrontRight.setDirection(DcMotor.Direction.REVERSE);
         wheelBackRight.setDirection(DcMotor.Direction.REVERSE);
 
-        wheelFrontRight.setVelocity(0);
-        wheelBackRight.setVelocity(0);
-        wheelFrontLeft.setVelocity(0);
-        wheelBackLeft.setVelocity(0);
+        wheelFrontRight.setPower(0);
+        wheelBackRight.setPower(0);
+        wheelBackLeft.setPower(0);
+        wheelBackRight.setPower(0);
+
+        vSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        elevation.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        vsldieInitPosition = vSlide.getCurrentPosition() ;
 
         //Get IMU.
         imu = hwMap.get(IMU.class, "imu");
 
         //Our robot mount Control hub Logo face backward, and USB port is facing Up.
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.UP;
-        RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.RIGHT;
+        RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
         RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
 
         // Now initialize the IMU with this mounting orientation
@@ -177,73 +180,6 @@ public class Hardware2024Fred {
         imu.initialize(new IMU.Parameters(orientationOnRobot));
 
 
-    }
-
-
-    public void turn(double degree) {
-        wheelFrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        wheelBackLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        wheelFrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        wheelBackRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        //Put motor back into run with encoder mode.
-        wheelFrontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        wheelBackLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        wheelFrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        wheelBackRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        //Get current orientation.  Angle is between -180 to 180
-        YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
-        double startHeading = orientation.getYaw(AngleUnit.DEGREES);
-        double endHeading = regulateDegree(startHeading + degree);
-
-        double currentHeading = startHeading;
-
-        Log.d("9010", "Start Heading: " + startHeading);
-        Log.d("9010", "End Heading: " + endHeading);
-
-        double difference = regulateDegree(currentHeading - endHeading);
-        Log.d("9010", "Difference: " + difference);
-
-        PIDFController turnPidfCrtler = new PIDFController(turnKP, turnKI, turnKD, turnKF);
-        Log.d("9010", "Kp: " + turnKP + "  turnKI: " + turnKI + " turnKD: " + turnKD);
-
-        turnPidfCrtler.setSetPoint(0);
-        //Set tolerance as 0.5 degrees
-        turnPidfCrtler.setTolerance(0.5);
-        //set Integration between -0.5 to 0.5 to avoid saturating PID output.
-        turnPidfCrtler.setIntegrationBounds(-0.5, 0.5);
-
-        Log.d("9010", "Before entering Loop ");
-
-        while (!turnPidfCrtler.atSetPoint()) {
-            currentHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
-            //Calculate new distance
-            difference = regulateDegree(currentHeading - endHeading);
-            double velocityCaculated = turnPidfCrtler.calculate(difference) / 10;
-
-            /*
-            Log.d("9010", "=====================");
-            Log.d("9010", "Difference: " + difference);
-            Log.d("9010", "Current Heading: " + currentHeading );
-            Log.d("9010", "Calculated Volocity:  " + velocityCaculated );
-             */
-
-            wheelFrontLeft.setVelocity(velocityCaculated * Hardware2023.ANGULAR_RATE);
-            wheelBackLeft.setVelocity(velocityCaculated * Hardware2023.ANGULAR_RATE);
-            wheelFrontRight.setVelocity(-velocityCaculated * Hardware2023.ANGULAR_RATE);
-            wheelBackRight.setVelocity(-velocityCaculated * Hardware2023.ANGULAR_RATE);
-        }
-
-
-        //wheelFrontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        //wheelFrontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        //wheelBackRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        //wheelBackLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        wheelFrontRight.setVelocity(0);
-        wheelFrontLeft.setVelocity(0);
-        wheelBackRight.setVelocity(0);
-        wheelBackLeft.setVelocity(0);
     }
 
     /**
@@ -261,4 +197,29 @@ public class Hardware2024Fred {
 
         return degree;
     }
+
+
+    public void freeMoveVerticalSlide(float power ) {
+        double slidePosition  = vSlide.getCurrentPosition();
+
+        //Control  Vslide
+        if ((power > 0 && slidePosition < slideUpperLimit) || (power < 0 && slidePosition > 0)) {
+            vSlide.setVelocity(power * ANGULAR_RATE);
+        } else {
+            vSlide.setVelocity(0);
+        }
+
+    }
+    public void elevation(float power) {
+        double slidePosition  = elevation.getCurrentPosition();
+        if ((power > 0 && slidePosition < slideUpperLimit) || (power < 0 && slidePosition > 0)) {
+            elevation.setVelocity(power * ANGULAR_RATE);
+
+        } else {
+            elevation.setVelocity(0);
+
+        }
+    }
+
+
 }
