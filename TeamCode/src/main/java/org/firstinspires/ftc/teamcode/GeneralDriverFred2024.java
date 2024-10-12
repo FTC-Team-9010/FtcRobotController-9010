@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.hardware.Hardware2022;
 import org.firstinspires.ftc.teamcode.hardware.Hardware2024Fred;
 import org.firstinspires.ftc.teamcode.hardware.MecanumWheels2023;
 
@@ -29,18 +30,17 @@ public class GeneralDriverFred2024 extends LinearOpMode {
 
         //This is the main loop of operation.
         while (opModeIsActive()) {
-            //hdw.checkAndGrabCone();
-
             //Wheel takes input of gampad 1  ,  turbo is the power factor. Range 0-1 , 1 is 100%
             robotWheel.joystick(gamepad1, .5);
 
+            hdw.wheelFrontLeft.setVelocity(  robotWheel.wheelFrontLeftPower *  Hardware2024Fred.ANGULAR_RATE );
+            hdw.wheelBackLeft.setVelocity(robotWheel.wheelBackLeftPower *  Hardware2024Fred.ANGULAR_RATE );
+            hdw.wheelFrontRight.setVelocity(robotWheel.wheelFrontRightPower *  Hardware2024Fred.ANGULAR_RATE );
+            hdw.wheelBackRight.setVelocity(robotWheel.wheelBackRightPower *  Hardware2024Fred.ANGULAR_RATE );
 
-            hdw.wheelFrontLeft.setPower(robotWheel.wheelFrontLeftPower);
-            hdw.wheelBackLeft.setPower(robotWheel.wheelBackLeftPower);
-            hdw.wheelFrontRight.setPower(robotWheel.wheelFrontRightPower);
-            hdw.wheelBackRight.setPower(robotWheel.wheelBackRightPower);
+            //hdw.freeMoveVerticalSlide(gamepad1.right_trigger - gamepad1.left_trigger);
 
-
+            //hdw.elevation(gamepad2.right_trigger - gamepad2.left_trigger);
         }
 
     }
