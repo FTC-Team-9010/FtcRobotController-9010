@@ -54,7 +54,7 @@ public class Hardware2024Fred {
     private double lnKD = 0.5;
     private double lnKF = 0.0;
 
-    private double moveTimeOut = 30000;
+    private double moveTimeOut = 5000;
 
     public double getLnKF() {
         return lnKF;
@@ -181,7 +181,7 @@ public class Hardware2024Fred {
         We define X as left/right, and Y as Forward/Backword. which is different than GoBuilda
         The wire on odometry computer shall reflect this.
          */
-        odo.setOffsets(-75.0, 55.0); //these are tuned for 3110-0002-0001 Product Insight #1
+        odo.setOffsets(-50.0, -150.0); //these are tuned for 3110-0002-0001 Product Insight #1
 
         /*
         Set the kind of pods used by your robot. If you're using goBILDA odometry pods, select either
@@ -273,9 +273,11 @@ public class Hardware2024Fred {
         wheelFrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         wheelBackRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        odo.bulkUpdate();
-        odo.resetPosAndIMU();
-        Thread.sleep(1000);
+
+        //odo.bulkUpdate();
+        //odo.resetPosAndIMU();
+        //Thread.sleep(1000);
+        //resetEncoders();
         odo.bulkUpdate();
         Pose2D initPos = odo.getPosition();
         Pose2D currentPos = null;
@@ -334,13 +336,12 @@ public class Hardware2024Fred {
                     + " Heading: " + currentPos.getHeading(AngleUnit.DEGREES) );
 
             double velocityYCaculated = lnYPidfCrtler.calculate(targetYPosition -currentPos.getY(DistanceUnit.MM) ) ;
-            double velocityXCaculated = lnXPidfCrtler.calculate(targetXPosition - currentPos.getX(DistanceUnit.MM) );
-            double rx = turnPidfCrtler.calculate(  targetHeading - currentPos.getHeading(AngleUnit.DEGREES) );
+            double velocityXCaculated = -lnXPidfCrtler.calculate(targetXPosition - currentPos.getX(DistanceUnit.MM) );
+            double rx = -turnPidfCrtler.calculate(  targetHeading - currentPos.getHeading(AngleUnit.DEGREES) );
 
             Log.d("9010", "Error X: " + (targetXPosition - currentPos.getX(DistanceUnit.MM) ) );
             Log.d("9010", "Error Y: " + (targetYPosition - currentPos.getY(DistanceUnit.MM) ));
             Log.d("9010", "Error heading: " + (targetHeading - currentPos.getHeading(AngleUnit.DEGREES)) );
-
 
             Log.d("9010", "velocityYCaculated: " + velocityYCaculated ) ;
             Log.d("9010", "velocityXCaculated " + velocityXCaculated );
@@ -357,6 +358,11 @@ public class Hardware2024Fred {
         wheelBackRight.setVelocity(0);
         wheelBackLeft.setVelocity(0);
 
+    }
+
+    public void resetEncoders() {
+        odo.resetXEncoder();
+        odo.resetYEncoder();
     }
 
 

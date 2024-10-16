@@ -460,6 +460,13 @@ public class GoBildaPinpointDriver extends I2cDeviceSynchDevice<I2cDeviceSynch> 
                 hOrientation);
     }
 
+    public void resetXEncoder() {
+        xEncoderValue = 0;
+    }
+
+    public void resetYEncoder() {
+        yEncoderValue = 0;
+    }
 
 
     /**
