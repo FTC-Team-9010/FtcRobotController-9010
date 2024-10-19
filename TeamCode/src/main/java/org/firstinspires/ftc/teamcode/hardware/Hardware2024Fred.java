@@ -164,8 +164,6 @@ public class Hardware2024Fred {
         wheelBackLeft.setPower(0);
         wheelBackRight.setPower(0);
 
-
-        //Slides
         //vSlide = hwMap.get(DcMotorEx.class, "vSlideM");
         //elevation = hwMap.get(DcMotorEx.class, "elev");
 
@@ -177,11 +175,9 @@ public class Hardware2024Fred {
         odo = hwMap.get(GoBildaPinpointDriver.class,"odo");
 
         /*
-        Set the odometry pod positions relative to the point that the odometry computer tracks around.
-        We define X as left/right, and Y as Forward/Backword. which is different than GoBuilda
-        The wire on odometry computer shall reflect this.
+          Please refer to Go Builder Example.
          */
-        odo.setOffsets(-50.0, -150.0); //these are tuned for 3110-0002-0001 Product Insight #1
+        odo.setOffsets(30.0, 140.0); //these are tuned for 3110-0002-0001 Product Insight #1
 
         /*
         Set the kind of pods used by your robot. If you're using goBILDA odometry pods, select either
@@ -192,11 +188,9 @@ public class Hardware2024Fred {
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
 
         /*
-        Set the direction that each of the two odometry pods count. The X (strafe) pod should
-        increase when you move the robot right. And the Y (forwad) pod should increase when
-        you move the robot to the right.
+          Please refer to Go Builder Example.
          */
-        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.REVERSED,
+        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD,
                 GoBildaPinpointDriver.EncoderDirection.REVERSED);
 
         /*
@@ -261,6 +255,7 @@ public class Hardware2024Fred {
      * @param heading Target heading, in degress,  Positive to turn left, negative to turn right.
      */
     public  void moveToXYPosition(double x , double y, double heading ) throws InterruptedException {
+        Log.d("9010", "Entering into moveToXYPosition ");
 
         wheelFrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         wheelBackLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -273,11 +268,12 @@ public class Hardware2024Fred {
         wheelFrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         wheelBackRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-
-        //odo.bulkUpdate();
-        //odo.resetPosAndIMU();
-        //Thread.sleep(1000);
-        //resetEncoders();
+        while ( odo.getDeviceStatus() != GoBildaPinpointDriver.DeviceStatus.READY) {
+            Log.d("9010", "Status: " + odo.getDeviceStatus());
+            Thread.sleep(10);
+            odo.bulkUpdate();
+        }
+        odo.resetPosAndIMU();
         odo.bulkUpdate();
         Pose2D initPos = odo.getPosition();
         Pose2D currentPos = null;
@@ -292,7 +288,6 @@ public class Hardware2024Fred {
         double startHeading = initPos.getHeading(AngleUnit.DEGREES);
         Log.d("9010", "current Heading:  " + startHeading);
 
-
         double targetXPosition = currenXPosition + x;
         double targetYPosition =currenYPosition + y;
         double targetHeading = startHeading + heading;
@@ -306,20 +301,18 @@ public class Hardware2024Fred {
         PIDFController turnPidfCrtler  = new PIDFController(turnKP, turnKI, turnKD, turnKF);
         Log.d("9010", "turnKp: " + turnKP + "  lnKI: " + turnKI + " turnKD: " + turnKD);
 
-
         lnYPidfCrtler.setSetPoint(0);
-        lnYPidfCrtler.setTolerance(2);
+        lnYPidfCrtler.setTolerance(10);
         //set Integration to avoid saturating PID output.
         lnYPidfCrtler.setIntegrationBounds(-1000 , 1000);
 
         lnXPidfCrtler.setSetPoint(0);
-        lnXPidfCrtler.setTolerance(2);
+        lnXPidfCrtler.setTolerance(10);
         lnXPidfCrtler.setIntegrationBounds(-1000 , 1000);
-
 
         turnPidfCrtler.setSetPoint(0);
         //Set tolerance as 0.5 degrees
-        turnPidfCrtler.setTolerance(0.5);
+        turnPidfCrtler.setTolerance(1);
         turnPidfCrtler.setIntegrationBounds(-1 , 1 );
 
         Log.d("9010", "Before entering Loop ");
@@ -335,8 +328,9 @@ public class Hardware2024Fred {
                     + " Y: " + currentPos.getY(DistanceUnit.MM)
                     + " Heading: " + currentPos.getHeading(AngleUnit.DEGREES) );
 
-            double velocityYCaculated = lnYPidfCrtler.calculate(targetYPosition -currentPos.getY(DistanceUnit.MM) ) ;
-            double velocityXCaculated = -lnXPidfCrtler.calculate(targetXPosition - currentPos.getX(DistanceUnit.MM) );
+            //Reverse X and Y, Gobuilda PinPoint odo meter has X on Foward, and Y on Strafe
+            double velocityXCaculated = lnYPidfCrtler.calculate(targetYPosition -currentPos.getY(DistanceUnit.MM) ) ;
+            double velocityYCaculated = lnXPidfCrtler.calculate(targetXPosition - currentPos.getX(DistanceUnit.MM) );
             double rx = -turnPidfCrtler.calculate(  targetHeading - currentPos.getHeading(AngleUnit.DEGREES) );
 
             Log.d("9010", "Error X: " + (targetXPosition - currentPos.getX(DistanceUnit.MM) ) );
@@ -347,10 +341,31 @@ public class Hardware2024Fred {
             Log.d("9010", "velocityXCaculated " + velocityXCaculated );
             Log.d("9010", "rx: "  + rx ) ;
 
-            wheelFrontLeft.setVelocity(velocityYCaculated + rx - velocityXCaculated);
-            wheelBackLeft.setVelocity(velocityYCaculated + rx+ velocityXCaculated);
-            wheelFrontRight.setVelocity(velocityYCaculated - rx + velocityXCaculated);
-            wheelBackRight.setVelocity(velocityYCaculated - rx - velocityXCaculated);
+            //As GoBuilda PinPoint driver gives field centric reading for x and y,
+            // We need to use the field centric formula.
+
+            // Rotate the movement direction counter to the bot's rotation
+            double rotX = velocityXCaculated * Math.cos(-currentPos.getHeading(AngleUnit.DEGREES)) -
+                    velocityYCaculated * Math.sin(-currentPos.getHeading(AngleUnit.DEGREES));
+            double rotY = velocityXCaculated * Math.sin(-currentPos.getHeading(AngleUnit.DEGREES))
+                    + velocityYCaculated * Math.cos(-currentPos.getHeading(AngleUnit.DEGREES));
+
+            rotX = rotX * 1.1;  // Counteract imperfect strafing
+
+            Log.d("9010", "RotX: " + rotX ) ;
+            Log.d("9010", "rotY " + rotY );
+
+
+            //double denominator = Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx);
+            double frontLeftVelocity = (rotY + rotX + rx) ;
+            double backLeftVelocity = (rotY - rotX + rx) ;
+            double frontRightVelocity = (rotY - rotX - rx) ;
+            double backRightVelocity  = (rotY + rotX - rx) ;
+
+            wheelFrontLeft.setVelocity(frontLeftVelocity);
+            wheelBackLeft.setVelocity(backLeftVelocity);
+            wheelFrontRight.setVelocity(frontRightVelocity);
+            wheelBackRight.setVelocity(backRightVelocity);
         }
 
         wheelFrontRight.setVelocity(0);
