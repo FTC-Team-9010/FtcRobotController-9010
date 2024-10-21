@@ -43,7 +43,7 @@ public class Hardware2024Fred {
 
     private double slideUpperLimit = 2000;
 
-    //PID control parameter for turning.
+    //PID control parameter for turning & linear movement.
     private double turnKP = 15;
     private double turnKI = 1;
     private double turnKD = 0.5;
@@ -268,12 +268,15 @@ public class Hardware2024Fred {
         wheelFrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         wheelBackRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+
+        odo.resetPosAndIMU();
+        odo.bulkUpdate();
         while ( odo.getDeviceStatus() != GoBildaPinpointDriver.DeviceStatus.READY) {
             Log.d("9010", "Status: " + odo.getDeviceStatus());
             Thread.sleep(10);
             odo.bulkUpdate();
         }
-        odo.resetPosAndIMU();
+
         odo.bulkUpdate();
         Pose2D initPos = odo.getPosition();
         Pose2D currentPos = null;
@@ -345,22 +348,22 @@ public class Hardware2024Fred {
             // We need to use the field centric formula.
 
             // Rotate the movement direction counter to the bot's rotation
-            double rotX = velocityXCaculated * Math.cos(-currentPos.getHeading(AngleUnit.DEGREES)) -
-                    velocityYCaculated * Math.sin(-currentPos.getHeading(AngleUnit.DEGREES));
-            double rotY = velocityXCaculated * Math.sin(-currentPos.getHeading(AngleUnit.DEGREES))
-                    + velocityYCaculated * Math.cos(-currentPos.getHeading(AngleUnit.DEGREES));
+            double beta =Math.toRadians (currentPos.getHeading(AngleUnit.DEGREES ) - startHeading) ;
+            double rotX = velocityXCaculated * Math.cos(-beta) -
+                    velocityYCaculated * Math.sin(-beta);
+            double rotY = velocityXCaculated * Math.sin(-beta)
+                    + velocityYCaculated * Math.cos(-beta);
 
-            rotX = rotX * 1.1;  // Counteract imperfect strafing
+            //rotX = rotX * 1.1;  // Counteract imperfect strafing
 
             Log.d("9010", "RotX: " + rotX ) ;
             Log.d("9010", "rotY " + rotY );
 
-
             //double denominator = Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx);
-            double frontLeftVelocity = (rotY + rotX + rx) ;
-            double backLeftVelocity = (rotY - rotX + rx) ;
-            double frontRightVelocity = (rotY - rotX - rx) ;
-            double backRightVelocity  = (rotY + rotX - rx) ;
+            double frontLeftVelocity = (rotY - rotX + rx) ;
+            double backLeftVelocity = (rotY + rotX + rx) ;
+            double frontRightVelocity = (rotY + rotX - rx) ;
+            double backRightVelocity  = (rotY - rotX - rx) ;
 
             wheelFrontLeft.setVelocity(frontLeftVelocity);
             wheelBackLeft.setVelocity(backLeftVelocity);
