@@ -250,8 +250,8 @@ public class Hardware2024Fred {
 
     /**
      * This operation moves robot to a position relative to its current position
-     * @param x  Target x position,  unit in mm   Positive to right, negative to left.
-     * @param y  Target x position,  unix in mm,  Positive to forward, negative to backward.
+     * @param x  Target x position,  unit in mm   Positive to forward, negative to backward.
+     * @param y  Target y position,  unix in mm,  Positive to left, negative to right.
      * @param heading Target heading, in degress,  Positive to turn left, negative to turn right.
      */
     public  void moveToXYPosition(double x , double y, double heading ) throws InterruptedException {
@@ -348,7 +348,7 @@ public class Hardware2024Fred {
             // We need to use the field centric formula.
 
             // Rotate the movement direction counter to the bot's rotation
-            double beta =Math.toRadians (currentPos.getHeading(AngleUnit.DEGREES ) - startHeading) ;
+            double beta = -Math.toRadians (currentPos.getHeading(AngleUnit.DEGREES ) - startHeading) ;
             double rotX = velocityXCaculated * Math.cos(-beta) -
                     velocityYCaculated * Math.sin(-beta);
             double rotY = velocityXCaculated * Math.sin(-beta)
