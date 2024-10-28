@@ -42,10 +42,14 @@ public class GeneralDriverFred2024 extends LinearOpMode {
 
             if (gamepad1.right_bumper) {
                 hdw.freeMoveElevation(1);
-            } else if (gamepad1.left_bumper) {
-                hdw.freeMoveSlide(-1);
             } else {
-                hdw.freeMoveSlide(0);
+                hdw.freeMoveElevation(0);
+            }
+
+            if (gamepad1.left_bumper) {
+                hdw.freeMoveElevation(-1);
+            } else {
+                hdw.freeMoveElevation(0);
             }
 
 
