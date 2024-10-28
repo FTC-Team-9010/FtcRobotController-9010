@@ -38,9 +38,17 @@ public class GeneralDriverFred2024 extends LinearOpMode {
             hdw.wheelFrontRight.setVelocity(robotWheel.wheelFrontRightPower *  Hardware2024Fred.ANGULAR_RATE );
             hdw.wheelBackRight.setVelocity(robotWheel.wheelBackRightPower *  Hardware2024Fred.ANGULAR_RATE );
 
-            //hdw.freeMoveVerticalSlide(gamepad1.right_trigger - gamepad1.left_trigger);
+            hdw.freeMoveSlide(gamepad1.right_trigger - gamepad1.left_trigger);
 
-            //hdw.elevation(gamepad2.right_trigger - gamepad2.left_trigger);
+            if (gamepad1.right_bumper) {
+                hdw.freeMoveElevation(1);
+            } else if (gamepad1.left_bumper) {
+                hdw.freeMoveSlide(-1);
+            } else {
+                hdw.freeMoveSlide(0);
+            }
+
+
         }
 
     }

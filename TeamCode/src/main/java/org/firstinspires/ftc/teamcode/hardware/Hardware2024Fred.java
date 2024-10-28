@@ -8,6 +8,7 @@ import android.util.Log;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -26,8 +27,10 @@ public class Hardware2024Fred {
     public DcMotorEx wheelFrontLeft = null;
     public DcMotorEx wheelBackRight = null;
     public DcMotorEx wheelBackLeft = null;
-    //public DcMotorEx vSlide = null;
-    //public DcMotorEx elevation = null;
+    public DcMotorEx vSlide = null;
+    public DcMotorEx elevation = null;
+
+    public Servo claw = null;
 
     // Declare OpMode member for the Odometry Computer
     GoBildaPinpointDriver odo;
@@ -42,6 +45,7 @@ public class Hardware2024Fred {
     private Telemetry telemetry;
 
     private double slideUpperLimit = 2000;
+    private double elevLimit = 1000;
 
     //PID control parameter for turning & linear movement.
     private double turnKP = 15;
@@ -164,12 +168,14 @@ public class Hardware2024Fred {
         wheelBackLeft.setPower(0);
         wheelBackRight.setPower(0);
 
-        //vSlide = hwMap.get(DcMotorEx.class, "vSlideM");
-        //elevation = hwMap.get(DcMotorEx.class, "elev");
+        claw = hwMap.get(Servo.class, "claw");
 
-        //vSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        //elevation.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        //vsldieInitPosition = vSlide.getCurrentPosition() ;
+        vSlide = hwMap.get(DcMotorEx.class, "vSlide");
+        elevation = hwMap.get(DcMotorEx.class, "elev");
+
+        vSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        elevation.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        int vsldieInitPosition = vSlide.getCurrentPosition() ;
 
         //init GoBuilda Odameter
         odo = hwMap.get(GoBildaPinpointDriver.class,"odo");
@@ -221,9 +227,9 @@ public class Hardware2024Fred {
         return degree;
     }
 
-    /*
 
-    public void freeMoveVerticalSlide(float power ) {
+
+    public void freeMoveSlide( float power ) {
         double slidePosition  = vSlide.getCurrentPosition();
         Log.d("9010", "ele position " + slidePosition);
 
@@ -235,18 +241,18 @@ public class Hardware2024Fred {
         }
 
     }
-    public void elevation(float power) {
+    public void freeMoveElevation(float power) {
         double elePosition   = elevation.getCurrentPosition();
         Log.d("9010", "ele position " + elePosition);
 
-        if ((power > 0 && elePosition < slideUpperLimit) || (power < 0 && elePosition > 0)) {
+        if ((power > 0 && elePosition < elevLimit) || (power < 0 && elePosition > 0)) {
             elevation.setVelocity(power * ANGULAR_RATE);
         } else {
             elevation.setVelocity(0);
 
         }
     }
-*/
+
 
     /**
      * This operation moves robot to a position relative to its current position
@@ -378,9 +384,12 @@ public class Hardware2024Fred {
 
     }
 
-    public void resetEncoders() {
-        odo.resetXEncoder();
-        odo.resetYEncoder();
+    public void openClaw() {
+        claw.setPosition(1);
+    }
+
+    public void closeClaw() {
+        claw.setPosition(0);
     }
 
 

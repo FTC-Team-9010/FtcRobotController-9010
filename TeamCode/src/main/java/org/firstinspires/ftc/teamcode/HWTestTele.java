@@ -43,13 +43,13 @@ public class HWTestTele  extends LinearOpMode {
                 hdw.setLnKP(pidCoffs[0]);
                 hdw.setLnKI(pidCoffs[1]);
                 hdw.setLnKD(pidCoffs[2]);
-                hdw.moveToXYPosition(0, 0, 45 );
+                hdw.moveToXYPosition(100, - 100, 45 );
             }
             if (gamepad1.dpad_right) {
                 hdw.setLnKP(pidCoffs[0]);
                 hdw.setLnKI(pidCoffs[1]);
                 hdw.setLnKD(pidCoffs[2]);
-                hdw.moveToXYPosition(0,  0 ,  90);
+                hdw.moveToXYPosition(-100,  100 ,  -45);
             }
             if (gamepad1.dpad_up) {
                 telemetry.addLine().addData("[moving y >]  ", " Y ");
@@ -115,9 +115,6 @@ public class HWTestTele  extends LinearOpMode {
                 telemetry.addLine().addData("[Kd :]  ", pidCoffs[2]);
                 telemetry.update();
                 sleep(100);
-            }
-            if (gamepad1.left_stick_button) {
-                hdw.resetEncoders();
             }
         }
     }
