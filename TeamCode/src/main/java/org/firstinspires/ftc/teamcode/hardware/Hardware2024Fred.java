@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -44,7 +45,7 @@ public class Hardware2024Fred {
     private boolean debug = true;
     private Telemetry telemetry;
 
-    private double slideUpperLimit = 2000;
+    private double slideUpperLimit = 4000;
     private double elevLimit = 1000;
 
     //PID control parameter for turning & linear movement.
@@ -139,6 +140,8 @@ public class Hardware2024Fred {
 
 
     private int vsldieInitPosition = 0;
+    private int elevInitPosition = 0;
+
     /**
      * Initialize hardware.
      */
@@ -174,8 +177,14 @@ public class Hardware2024Fred {
         elevation = hwMap.get(DcMotorEx.class, "elev");
 
         vSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        vSlide.setDirection(DcMotorSimple.Direction.REVERSE);
         elevation.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        int vsldieInitPosition = vSlide.getCurrentPosition() ;
+        vsldieInitPosition = vSlide.getCurrentPosition() ;
+        elevInitPosition = elevation.getCurrentPosition() ;
+        elevation.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+
+
 
         //init GoBuilda Odameter
         odo = hwMap.get(GoBildaPinpointDriver.class,"odo");
@@ -231,7 +240,7 @@ public class Hardware2024Fred {
 
     public void freeMoveSlide( float power ) {
         double slidePosition  = vSlide.getCurrentPosition();
-        Log.d("9010", "ele position " + slidePosition);
+        Log.d("9010", "vSlide position " + slidePosition);
 
         //Control  Vslide
         if ((power > 0 && slidePosition < slideUpperLimit) || (power < 0 && slidePosition > 0)) {
@@ -243,15 +252,44 @@ public class Hardware2024Fred {
     }
     public void freeMoveElevation(float power) {
         double elePosition   = elevation.getCurrentPosition();
-        Log.d("9010", "ele position " + elePosition);
+        //Log.d("9010", "ele position " + elePosition);
 
         if ((power > 0 && elePosition < elevLimit) || (power < 0 && elePosition > 0)) {
             elevation.setVelocity(power * ANGULAR_RATE);
         } else {
             elevation.setVelocity(0);
-
         }
     }
+
+    public void goElevation ( int  position  ) {
+        int targetPosition = elevInitPosition + position;
+
+        //Move the slide
+        int currentPosition = elevation.getCurrentPosition();
+        Log.d("9010", "elev position before Move: " + elevation.getCurrentPosition());
+
+        elevation.setTargetPosition(targetPosition);
+        Log.d("9010", "Target position : " + targetPosition);
+        elevation.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        int sign = 1;
+
+        if ((currentPosition - targetPosition) > 0 ) {
+            sign= -1;
+        } else {
+            //raise slide
+            sign = 1;
+        }
+
+        while (elevation.isBusy()) {
+            elevation.setVelocity( sign * ANGULAR_RATE);
+            //Log.d("9010", "Inside Moving Loop : " + vSlide.getCurrentPosition() + " Sign: " + sign);
+        }
+        elevation.setVelocity(0);
+        Log.d("9010", "after Moving Loop : " + elevation.getCurrentPosition());
+        //Set mode back to Run using encoder.
+        elevation.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
 
 
     /**
