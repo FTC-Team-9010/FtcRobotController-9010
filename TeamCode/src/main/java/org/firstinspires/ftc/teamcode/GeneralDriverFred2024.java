@@ -60,7 +60,6 @@ public class GeneralDriverFred2024 extends LinearOpMode {
                 hdw.openClaw();
             }
 
-
         }
 
     }

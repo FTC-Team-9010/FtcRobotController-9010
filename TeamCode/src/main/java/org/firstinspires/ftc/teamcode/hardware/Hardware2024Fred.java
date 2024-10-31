@@ -178,12 +178,11 @@ public class Hardware2024Fred {
 
         vSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         vSlide.setDirection(DcMotorSimple.Direction.REVERSE);
-        elevation.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        elevation.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         vsldieInitPosition = vSlide.getCurrentPosition() ;
         elevInitPosition = elevation.getCurrentPosition() ;
         elevation.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-
 
 
         //init GoBuilda Odameter
@@ -262,32 +261,34 @@ public class Hardware2024Fred {
     }
 
     public void goElevation ( int  position  ) {
+
         int targetPosition = elevInitPosition + position;
 
         //Move the slide
         int currentPosition = elevation.getCurrentPosition();
         Log.d("9010", "elev position before Move: " + elevation.getCurrentPosition());
 
-        elevation.setTargetPosition(targetPosition);
-        Log.d("9010", "Target position : " + targetPosition);
-        elevation.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        int sign = 1;
+        //if it's not busy, send new position command
+        if ( ! elevation.isBusy() ) {
+            elevation.setTargetPosition(targetPosition);
+            Log.d("9010", "Target position : " + targetPosition);
+            elevation.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            int sign = 1;
 
-        if ((currentPosition - targetPosition) > 0 ) {
-            sign= -1;
-        } else {
-            //raise slide
-            sign = 1;
+            if ((currentPosition - targetPosition) > 0) {
+                sign = -1;
+            } else {
+                //raise slide
+                sign = 1;
+            }
+            elevation.setVelocity(sign * ANGULAR_RATE);
         }
 
-        while (elevation.isBusy()) {
-            elevation.setVelocity( sign * ANGULAR_RATE);
-            //Log.d("9010", "Inside Moving Loop : " + vSlide.getCurrentPosition() + " Sign: " + sign);
-        }
-        elevation.setVelocity(0);
+
+        //Log.d("9010", "Inside Moving Loop : " + vSlide.getCurrentPosition() + " Sign: " + sign);
+
         Log.d("9010", "after Moving Loop : " + elevation.getCurrentPosition());
-        //Set mode back to Run using encoder.
-        elevation.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
     }
 
 
@@ -423,11 +424,11 @@ public class Hardware2024Fred {
     }
 
     public void openClaw() {
-        claw.setPosition(1);
+        claw.setPosition(0);
     }
 
     public void closeClaw() {
-        claw.setPosition(0);
+        claw.setPosition(1);
     }
 
 
