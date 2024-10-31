@@ -46,7 +46,9 @@ public class Hardware2024Fred {
     private Telemetry telemetry;
 
     private double slideUpperLimit = 4000;
+    private double slideHorizontalLimit = 2750;
     private double elevLimit = 1000;
+    private double elevThreadshold = 900;
 
     //PID control parameter for turning & linear movement.
     private double turnKP = 15;
@@ -175,11 +177,12 @@ public class Hardware2024Fred {
 
         vSlide = hwMap.get(DcMotorEx.class, "vSlide");
         elevation = hwMap.get(DcMotorEx.class, "elev");
+        vSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        elevation.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         vSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         vSlide.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        elevation.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         vsldieInitPosition = vSlide.getCurrentPosition() ;
         elevInitPosition = elevation.getCurrentPosition() ;
         elevation.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -240,9 +243,13 @@ public class Hardware2024Fred {
     public void freeMoveSlide( float power ) {
         double slidePosition  = vSlide.getCurrentPosition();
         Log.d("9010", "vSlide position " + slidePosition);
+        double elePosition = elevation.getCurrentPosition();
+        Log.d("9010", "ele position " + slidePosition);
 
         //Control  Vslide
-        if ((power > 0 && slidePosition < slideUpperLimit) || (power < 0 && slidePosition > 0)) {
+        if ( (power > 0 && ( ( elePosition < elevThreadshold &&  slidePosition < slideHorizontalLimit ) ||
+                             ( elePosition > elevThreadshold &&  slidePosition < slideUpperLimit) ) )
+                || (power < 0 && slidePosition > 0)) {
             vSlide.setVelocity(power * ANGULAR_RATE);
         } else {
             vSlide.setVelocity(0);
@@ -266,28 +273,31 @@ public class Hardware2024Fred {
 
         //Move the slide
         int currentPosition = elevation.getCurrentPosition();
-        Log.d("9010", "elev position before Move: " + elevation.getCurrentPosition());
+        //Log.d("9010", "elev position before Move: " + elevation.getCurrentPosition());
 
-        //if it's not busy, send new position command
-        if ( ! elevation.isBusy() ) {
-            elevation.setTargetPosition(targetPosition);
-            Log.d("9010", "Target position : " + targetPosition);
-            elevation.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            int sign = 1;
 
-            if ((currentPosition - targetPosition) > 0) {
-                sign = -1;
+        int difference = targetPosition - currentPosition;
+        Log.d("9010", "Difference:  " + difference );
+
+        //Only set if difference is large otherwise do nothing.
+        if ( Math.abs(difference) > 30 ) {
+            //if it's not busy, send new position command
+            if (!elevation.isBusy()) {
+                elevation.setTargetPosition(targetPosition);
+                elevation.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                Log.d("9010", "Set Target position : " + targetPosition);
+                elevation.setPower(0.5);
             } else {
-                //raise slide
-                sign = 1;
+
             }
-            elevation.setVelocity(sign * ANGULAR_RATE);
+        } else {
+            elevation.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            elevation.setPower(0);
+            elevation.setZeroPowerBehavior( DcMotor.ZeroPowerBehavior.BRAKE);
         }
-
-
         //Log.d("9010", "Inside Moving Loop : " + vSlide.getCurrentPosition() + " Sign: " + sign);
 
-        Log.d("9010", "after Moving Loop : " + elevation.getCurrentPosition());
+        //Log.d("9010", "Elev after Move : " + elevation.getCurrentPosition());
 
     }
 
