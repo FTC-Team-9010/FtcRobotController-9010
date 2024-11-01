@@ -47,7 +47,7 @@ public class Hardware2024Fred {
 
     private double slideUpperLimit = 4000;
     private double slideHorizontalLimit = 2750;
-    private double elevLimit = 1000;
+    public double elevLimit = 1000;
     private double elevThreadshold = 900;
 
     //PID control parameter for turning & linear movement.
@@ -275,12 +275,11 @@ public class Hardware2024Fred {
         int currentPosition = elevation.getCurrentPosition();
         //Log.d("9010", "elev position before Move: " + elevation.getCurrentPosition());
 
-
         int difference = targetPosition - currentPosition;
         Log.d("9010", "Difference:  " + difference );
 
         //Only set if difference is large otherwise do nothing.
-        if ( Math.abs(difference) > 30 ) {
+        if ( Math.abs(difference) > 15 && ( targetPosition - elevInitPosition) > -50 ) {
             //if it's not busy, send new position command
             if (!elevation.isBusy()) {
                 elevation.setTargetPosition(targetPosition);

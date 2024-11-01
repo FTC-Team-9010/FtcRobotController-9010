@@ -43,14 +43,18 @@ public class GeneralDriverFred2024 extends LinearOpMode {
             hdw.freeMoveSlide(gamepad1.right_trigger - gamepad1.left_trigger);
 
             if (gamepad1.right_bumper) {
-                elevationPosition +=5;
+                if ( elevationPosition< hdw.elevLimit) {
+                    elevationPosition += 5;
+                }
                 telemetry.clearAll();
                 telemetry.addData("[>]", "Elevation Position: " + elevationPosition);
                 telemetry.update();
             }
 
             if (gamepad1.left_bumper) {
-                elevationPosition -=5 ;
+                if ( elevationPosition > 0 ) {
+                    elevationPosition -= 5;
+                }
                 telemetry.clearAll();
                 telemetry.addData("[>]", "Elevation Position: " + elevationPosition);
                 telemetry.update();
