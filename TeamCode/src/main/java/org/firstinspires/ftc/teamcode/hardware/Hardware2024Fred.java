@@ -45,10 +45,12 @@ public class Hardware2024Fred {
     private boolean debug = true;
     private Telemetry telemetry;
 
-    private double slideUpperLimit = 4000;
-    private double slideHorizontalLimit = 2750;
-    public double elevLimit = 1000;
-    private double elevThreadshold = 900;
+    private final  double slideUpperLimit = 4000;
+    //2750 is about 1/4 inch longer during inspection on 1st league meet  11/2/2024
+    private final double  slideHorizontalLimit = 2700;
+    public final double elevLimit = 1000;
+    //Only allow slide to extend longer after passthing this threashold.
+    private final double elevThreadshold = 900;
 
     //PID control parameter for turning & linear movement.
     private double turnKP = 15;
