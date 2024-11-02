@@ -281,7 +281,7 @@ public class Hardware2024Fred {
         Log.d("9010", "Difference:  " + difference );
 
         //Only set if difference is large otherwise do nothing.
-        if ( Math.abs(difference) > 15 && ( targetPosition - elevInitPosition) > -50 ) {
+        if ( Math.abs(difference) > 10 && ( targetPosition - elevInitPosition) > -50 ) {
             //if it's not busy, send new position command
             if (!elevation.isBusy()) {
                 elevation.setTargetPosition(targetPosition);
