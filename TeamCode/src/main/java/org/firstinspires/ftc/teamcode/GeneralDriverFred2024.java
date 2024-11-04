@@ -54,8 +54,9 @@ public class GeneralDriverFred2024 extends LinearOpMode {
             }
 
             if (gamepad1.left_bumper) {
+                //make it faster move down
                 if ( elevationPosition > 0 ) {
-                    elevationPosition -= 5;
+                    elevationPosition -= 10;
                 }
                 telemetry.clearAll();
                 telemetry.addData("[>]", "Elevation Position: " + elevationPosition);
