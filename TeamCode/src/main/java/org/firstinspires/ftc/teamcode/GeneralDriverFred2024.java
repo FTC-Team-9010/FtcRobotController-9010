@@ -29,11 +29,13 @@ public class GeneralDriverFred2024 extends LinearOpMode {
         telemetry.clearAll();
 
         int elevationPosition = 0;
+        double turbo = 1;
 
         //This is the main loop of operation.
         while (opModeIsActive()) {
             //Wheel takes input of gampad 1  ,  turbo is the power factor. Range 0-1 , 1 is 100%
-            robotWheel.joystick(gamepad1, .7);
+
+            robotWheel.joystick(gamepad1, turbo);
 
             hdw.wheelFrontLeft.setVelocity(  robotWheel.wheelFrontLeftPower *  Hardware2024Fred.ANGULAR_RATE );
             hdw.wheelBackLeft.setVelocity(robotWheel.wheelBackLeftPower *  Hardware2024Fred.ANGULAR_RATE );
@@ -68,6 +70,22 @@ public class GeneralDriverFred2024 extends LinearOpMode {
 
             if (gamepad1.y) {
                 hdw.openClaw();
+
+            }
+
+            if (gamepad1.a) {
+                turbo = 1;
+                telemetry.clearAll();
+                telemetry.addData("[>]", "Turbo:  " + turbo);
+                telemetry.update();
+
+            }
+
+            if (gamepad1.b) {
+                turbo = 0.1 ;
+                telemetry.clearAll();
+                telemetry.addData("[>]", "Turbo:  " + turbo);
+                telemetry.update();
             }
 
         }
