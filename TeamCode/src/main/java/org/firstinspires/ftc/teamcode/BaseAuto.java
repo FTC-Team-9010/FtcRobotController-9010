@@ -26,7 +26,25 @@ public abstract class BaseAuto extends LinearOpMode {
 
         waitForStart();
 
-        park();
+        scoreSpiecemen ();
+        //park();
         idle();
     }
+
+    /**
+     * Score the speicement
+     */
+    void scoreSpiecemen () {
+        //move to position
+        try {
+            hdw.moveToXYPosition(400,0,0);
+            hdw.moveSlide(300);
+            hdw.goElevation(900);
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+    }
+
 }

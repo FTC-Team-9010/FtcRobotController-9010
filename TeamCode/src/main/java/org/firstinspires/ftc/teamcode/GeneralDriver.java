@@ -7,7 +7,6 @@ import org.firstinspires.ftc.teamcode.hardware.Hardware2022;
 import org.firstinspires.ftc.teamcode.hardware.MecanumWheels2022;
 
 @TeleOp(name="GeneralDriver2022", group="TeleOps")
-
 public class GeneralDriver extends LinearOpMode {
 
     private boolean debug = true;

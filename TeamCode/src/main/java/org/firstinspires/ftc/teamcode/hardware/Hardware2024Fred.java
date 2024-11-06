@@ -181,6 +181,7 @@ public class Hardware2024Fred {
         elevation = hwMap.get(DcMotorEx.class, "elev");
         vSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         elevation.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        elevation.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         vSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         vSlide.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -240,8 +241,6 @@ public class Hardware2024Fred {
         return degree;
     }
 
-
-
     public void freeMoveSlide( float power ) {
         double slidePosition  = vSlide.getCurrentPosition();
         Log.d("9010", "vSlide position " + slidePosition);
@@ -258,17 +257,42 @@ public class Hardware2024Fred {
         }
 
     }
-    public void freeMoveElevation(float power) {
-        double elePosition   = elevation.getCurrentPosition();
-        //Log.d("9010", "ele position " + elePosition);
 
-        if ((power > 0 && elePosition < elevLimit) || (power < 0 && elePosition > 0)) {
-            elevation.setVelocity(power * ANGULAR_RATE);
-        } else {
-            elevation.setVelocity(0);
+    /**
+     * This is the method to be go to position by auto tele
+     * This method will block when motor is busy to get to the position.
+     *
+     * @param position
+     */
+    public void moveSlide  ( int  position  ) throws InterruptedException {
+
+        int targetPosition =  vsldieInitPosition +  position;
+
+        //Move the slide
+        int currentPosition = vSlide.getCurrentPosition();
+        //Log.d("9010", "elev position before Move: " + elevation.getCurrentPosition());
+
+        int difference = targetPosition - currentPosition;
+        Log.d("9010", "slide Diff:  " + difference);
+
+        elevation.setTargetPosition(targetPosition);
+        elevation.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        Log.d("9010", "Set Target position : " + targetPosition);
+        elevation.setPower(1);
+        while ( elevation.isBusy()) {
+            Thread.sleep(100);
         }
+        //Put back into run using encoder
+        elevation.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
+
+    /**
+     * This method move elevation to a position, it can be used in driver tele
+     * It won't block, elelvation need to apply constant power to keep in place.
+     *
+     * @param position
+     */
     public void goElevation ( int  position  ) {
 
         int targetPosition = elevInitPosition + position;
@@ -292,12 +316,10 @@ public class Hardware2024Fred {
 
             }
         } else {
-            elevation.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            elevation.setPower(0);
             elevation.setZeroPowerBehavior( DcMotor.ZeroPowerBehavior.BRAKE);
+            elevation.setPower(0);
         }
         //Log.d("9010", "Inside Moving Loop : " + vSlide.getCurrentPosition() + " Sign: " + sign);
-
         //Log.d("9010", "Elev after Move : " + elevation.getCurrentPosition());
 
     }
@@ -323,7 +345,6 @@ public class Hardware2024Fred {
         wheelBackLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         wheelFrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         wheelBackRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
 
         odo.resetPosAndIMU();
         odo.bulkUpdate();

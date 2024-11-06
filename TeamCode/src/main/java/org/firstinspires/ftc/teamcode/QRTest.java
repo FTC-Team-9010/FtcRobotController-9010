@@ -12,7 +12,7 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-@TeleOp(name = "QR Code Test")
+//@TeleOp(name = "QR Code Test")
 public class QRTest  extends LinearOpMode  {
 
     OpenCvWebcam webCam;

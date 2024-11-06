@@ -15,7 +15,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.hardware.Hardware2023;
 
-@TeleOp(name = "ProtoTele2023", group = "TeleOp")
+//@TeleOp(name = "ProtoTele2023", group = "TeleOp")
 public class ProtoTele2023 extends LinearOpMode  {
     private Hardware2023 hdw;
 
