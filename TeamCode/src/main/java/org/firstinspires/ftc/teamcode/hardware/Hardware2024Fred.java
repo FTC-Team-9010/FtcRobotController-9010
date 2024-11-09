@@ -129,6 +129,22 @@ public class Hardware2024Fred {
         this.lnKP = lnKP;
     }
 
+    public DcMotorEx getElevation() {
+        return elevation;
+    }
+
+    public void setElevation(DcMotorEx elevation) {
+        this.elevation = elevation;
+    }
+
+    public int getElevInitPosition() {
+        return elevInitPosition;
+    }
+
+    public void setElevInitPosition(int elevInitPosition) {
+        this.elevInitPosition = elevInitPosition;
+    }
+
     /**
      * Constructor
      *
@@ -305,7 +321,7 @@ public class Hardware2024Fred {
         Log.d("9010", "Difference:  " + difference );
 
         //Only set if difference is large otherwise do nothing.
-        if ( Math.abs(difference) > 10 && ( targetPosition - elevInitPosition) > -50 ) {
+        //if ( Math.abs(difference) > 10 && ( targetPosition - elevInitPosition) > -50 ) {
             //if it's not busy, send new position command
             if (!elevation.isBusy()) {
                 elevation.setTargetPosition(targetPosition);
@@ -313,12 +329,13 @@ public class Hardware2024Fred {
                 Log.d("9010", "Set Target position : " + targetPosition);
                 elevation.setPower(0.5);
             } else {
-
+                Log.d("9010", "Motor Busy" );
             }
+        /*
         } else {
             elevation.setZeroPowerBehavior( DcMotor.ZeroPowerBehavior.BRAKE);
             elevation.setPower(0);
-        }
+        } */
         //Log.d("9010", "Inside Moving Loop : " + vSlide.getCurrentPosition() + " Sign: " + sign);
         //Log.d("9010", "Elev after Move : " + elevation.getCurrentPosition());
 
@@ -404,22 +421,22 @@ public class Hardware2024Fred {
             //Get Odo meter reading
             odo.bulkUpdate();
             currentPos  = odo.getPosition();
-            Log.d ("9010", "odo readings,  X: "   +  currentPos.getX(DistanceUnit.MM)
+            /* Log.d ("9010", "odo readings,  X: "   +  currentPos.getX(DistanceUnit.MM)
                     + " Y: " + currentPos.getY(DistanceUnit.MM)
                     + " Heading: " + currentPos.getHeading(AngleUnit.DEGREES) );
-
+            */
             //Reverse X and Y, Gobuilda PinPoint odo meter has X on Foward, and Y on Strafe
             double velocityXCaculated = lnYPidfCrtler.calculate(targetYPosition -currentPos.getY(DistanceUnit.MM) ) ;
             double velocityYCaculated = lnXPidfCrtler.calculate(targetXPosition - currentPos.getX(DistanceUnit.MM) );
             double rx = -turnPidfCrtler.calculate(  targetHeading - currentPos.getHeading(AngleUnit.DEGREES) );
 
-            Log.d("9010", "Error X: " + (targetXPosition - currentPos.getX(DistanceUnit.MM) ) );
-            Log.d("9010", "Error Y: " + (targetYPosition - currentPos.getY(DistanceUnit.MM) ));
-            Log.d("9010", "Error heading: " + (targetHeading - currentPos.getHeading(AngleUnit.DEGREES)) );
+            //Log.d("9010", "Error X: " + (targetXPosition - currentPos.getX(DistanceUnit.MM) ) );
+            //Log.d("9010", "Error Y: " + (targetYPosition - currentPos.getY(DistanceUnit.MM) ));
+            //Log.d("9010", "Error heading: " + (targetHeading - currentPos.getHeading(AngleUnit.DEGREES)) );
 
-            Log.d("9010", "velocityYCaculated: " + velocityYCaculated ) ;
-            Log.d("9010", "velocityXCaculated " + velocityXCaculated );
-            Log.d("9010", "rx: "  + rx ) ;
+            //Log.d("9010", "velocityYCaculated: " + velocityYCaculated ) ;
+            //Log.d("9010", "velocityXCaculated " + velocityXCaculated );
+            //Log.d("9010", "rx: "  + rx ) ;
 
             //As GoBuilda PinPoint driver gives field centric reading for x and y,
             // We need to use the field centric formula.
@@ -431,12 +448,9 @@ public class Hardware2024Fred {
             double rotY = velocityXCaculated * Math.sin(-beta)
                     + velocityYCaculated * Math.cos(-beta);
 
-            //rotX = rotX * 1.1;  // Counteract imperfect strafing
+            //Log.d("9010", "RotX: " + rotX ) ;
+            //Log.d("9010", "rotY " + rotY );
 
-            Log.d("9010", "RotX: " + rotX ) ;
-            Log.d("9010", "rotY " + rotY );
-
-            //double denominator = Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx);
             double frontLeftVelocity = (rotY - rotX + rx) ;
             double backLeftVelocity = (rotY + rotX + rx) ;
             double frontRightVelocity = (rotY + rotX - rx) ;

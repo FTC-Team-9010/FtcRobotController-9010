@@ -6,9 +6,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 /**
  * This class runs on another thread to controll the arm motor position
- *
  */
-public class ArmControlThread implements  Runnable {
+public class ArmControlRunable implements Runnable {
 
     /**
      * Whether it shall run.
@@ -20,9 +19,10 @@ public class ArmControlThread implements  Runnable {
     private int eleInitPosition;
     private int position;
 
-    ArmControlThread(DcMotor ele, int eleInitPosition) {
+    public ArmControlRunable(DcMotor ele, int eleInitPosition) {
         this.elevation = ele;
         this.eleInitPosition = eleInitPosition;
+        this.position = 0;
     }
 
     public boolean isShallRun() {
@@ -59,34 +59,31 @@ public class ArmControlThread implements  Runnable {
 
     @Override
     public void run() {
+        Log.d("9010", "Into armThread");
 
-        while ( this.shallRun == true ) {
+        while (this.shallRun == true) {
 
             int targetPosition = eleInitPosition + position;
-
             //Move the slide
             int currentPosition = elevation.getCurrentPosition();
             //Log.d("9010", "elev position before Move: " + elevation.getCurrentPosition());
 
             int difference = targetPosition - currentPosition;
-            Log.d("9010", "Difference:  " + difference );
+            //Log.d("9010", "Difference:  " + difference + " target position: " + targetPosition
+            //        + "eleInitPosition: " + eleInitPosition);
 
-            //Only set if difference is large otherwise do nothing.
-            if ( Math.abs(difference) > 10 && ( targetPosition - eleInitPosition) > -50 ) {
-                //if it's not busy, send new position command
-                if (!elevation.isBusy()) {
-                    elevation.setTargetPosition(targetPosition);
-                    elevation.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    Log.d("9010", "Set Target position : " + targetPosition);
-                    elevation.setPower(0.5);
-                } else {
-
-                }
+            //if it's not busy, send new position command
+            if (!elevation.isBusy()) {
+                //Only set if difference is large otherwise do nothing.
+                elevation.setTargetPosition(targetPosition);
+                elevation.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                Log.d("9010", "Set Target position : " + targetPosition);
+                elevation.setPower(0.7);
             } else {
-                elevation.setZeroPowerBehavior( DcMotor.ZeroPowerBehavior.BRAKE);
-                elevation.setPower(0);
+                //Log.d("9010", "Motor busy!");
             }
 
         }
+        Log.d("9010", "Thread run ends");
     }
 }
