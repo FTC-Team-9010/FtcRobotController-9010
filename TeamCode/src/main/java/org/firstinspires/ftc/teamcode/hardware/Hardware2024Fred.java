@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
 
-
 import com.arcrobotics.ftclib.controller.PIDFController;
+
 import android.util.Log;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -45,12 +45,12 @@ public class Hardware2024Fred {
     private boolean debug = true;
     private Telemetry telemetry;
 
-    private final  double slideUpperLimit = 4000;
+    public final int slideUpperLimit = 4000;
     //2750 is about 1/4 inch longer during inspection on 1st league meet  11/2/2024
-    private final double  slideHorizontalLimit = 2700;
-    public final double elevLimit = 1000;
+    public final int slideHorizontalLimit = 2700;
+    public final int elevLimit = 940;
     //Only allow slide to extend longer after passthing this threashold.
-    private final double elevThreadshold = 900;
+    public final int elevThreadshold = 900;
 
     //PID control parameter for turning & linear movement.
     private double turnKP = 15;
@@ -154,7 +154,7 @@ public class Hardware2024Fred {
     public Hardware2024Fred(HardwareMap m, Telemetry tm) {
         hwMap = m;
         telemetry = tm;
-        odo = hwMap.get(GoBildaPinpointDriver.class,"odo");
+        odo = hwMap.get(GoBildaPinpointDriver.class, "odo");
 
     }
 
@@ -202,13 +202,13 @@ public class Hardware2024Fred {
         vSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         vSlide.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        vsldieInitPosition = vSlide.getCurrentPosition() ;
-        elevInitPosition = elevation.getCurrentPosition() ;
+        vsldieInitPosition = vSlide.getCurrentPosition();
+        elevInitPosition = elevation.getCurrentPosition();
         elevation.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
         //init GoBuilda Odameter
-        odo = hwMap.get(GoBildaPinpointDriver.class,"odo");
+        odo = hwMap.get(GoBildaPinpointDriver.class, "odo");
 
         /*
           Please refer to Go Builder Example.
@@ -257,15 +257,15 @@ public class Hardware2024Fred {
         return degree;
     }
 
-    public void freeMoveSlide( float power ) {
-        double slidePosition  = vSlide.getCurrentPosition();
+    public void freeMoveSlide(float power) {
+        double slidePosition = vSlide.getCurrentPosition();
         Log.d("9010", "vSlide position " + slidePosition);
         double elePosition = elevation.getCurrentPosition();
-        Log.d("9010", "ele position " + slidePosition);
+        Log.d("9010", "ele position " + elePosition);
 
         //Control  Vslide
-        if ( (power > 0 && ( ( elePosition < elevThreadshold &&  slidePosition < slideHorizontalLimit ) ||
-                             ( elePosition > elevThreadshold &&  slidePosition < slideUpperLimit) ) )
+        if ((power > 0 && ((elePosition < elevThreadshold && slidePosition < slideHorizontalLimit) ||
+                (elePosition > elevThreadshold && slidePosition < slideUpperLimit)))
                 || (power < 0 && slidePosition > 0)) {
             vSlide.setVelocity(power * ANGULAR_RATE);
         } else {
@@ -280,9 +280,9 @@ public class Hardware2024Fred {
      *
      * @param position
      */
-    public void moveSlide  ( int  position  ) throws InterruptedException {
+    public void moveSlide(int position) throws InterruptedException {
 
-        int targetPosition =  vsldieInitPosition +  position;
+        int targetPosition = vsldieInitPosition + position;
 
         //Move the slide
         int currentPosition = vSlide.getCurrentPosition();
@@ -291,15 +291,15 @@ public class Hardware2024Fred {
         int difference = targetPosition - currentPosition;
         Log.d("9010", "slide Diff:  " + difference);
 
-        elevation.setTargetPosition(targetPosition);
-        elevation.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        Log.d("9010", "Set Target position : " + targetPosition);
-        elevation.setPower(1);
-        while ( elevation.isBusy()) {
+        vSlide.setTargetPosition(targetPosition);
+        vSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        Log.d("9010", "Set Slide Target position : " + targetPosition);
+        vSlide.setPower(0.5);
+        while (vSlide.isBusy()) {
             Thread.sleep(100);
         }
         //Put back into run using encoder
-        elevation.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        vSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
 
@@ -309,7 +309,7 @@ public class Hardware2024Fred {
      *
      * @param position
      */
-    public void goElevation ( int  position  ) {
+    public void goElevation(int position) {
 
         int targetPosition = elevInitPosition + position;
 
@@ -317,39 +317,28 @@ public class Hardware2024Fred {
         int currentPosition = elevation.getCurrentPosition();
         //Log.d("9010", "elev position before Move: " + elevation.getCurrentPosition());
 
-        int difference = targetPosition - currentPosition;
-        Log.d("9010", "Difference:  " + difference );
-
-        //Only set if difference is large otherwise do nothing.
-        //if ( Math.abs(difference) > 10 && ( targetPosition - elevInitPosition) > -50 ) {
-            //if it's not busy, send new position command
+        if (position > 0 && position < elevLimit){
             if (!elevation.isBusy()) {
                 elevation.setTargetPosition(targetPosition);
                 elevation.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 Log.d("9010", "Set Target position : " + targetPosition);
                 elevation.setPower(0.5);
             } else {
-                Log.d("9010", "Motor Busy" );
+                //Log.d("9010", "Motor Busy");
             }
-        /*
-        } else {
-            elevation.setZeroPowerBehavior( DcMotor.ZeroPowerBehavior.BRAKE);
-            elevation.setPower(0);
-        } */
-        //Log.d("9010", "Inside Moving Loop : " + vSlide.getCurrentPosition() + " Sign: " + sign);
-        //Log.d("9010", "Elev after Move : " + elevation.getCurrentPosition());
+        }
 
     }
 
 
-
     /**
      * This operation moves robot to a position relative to its current position
-     * @param x  Target x position,  unit in mm   Positive to forward, negative to backward.
-     * @param y  Target y position,  unix in mm,  Positive to left, negative to right.
+     *
+     * @param x       Target x position,  unit in mm   Positive to forward, negative to backward.
+     * @param y       Target y position,  unix in mm,  Positive to left, negative to right.
      * @param heading Target heading, in degress,  Positive to turn left, negative to turn right.
      */
-    public  void moveToXYPosition(double x , double y, double heading ) throws InterruptedException {
+    public void moveToXYPosition(double x, double y, double heading) throws InterruptedException {
         Log.d("9010", "Entering into moveToXYPosition ");
 
         wheelFrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -365,7 +354,7 @@ public class Hardware2024Fred {
 
         odo.resetPosAndIMU();
         odo.bulkUpdate();
-        while ( odo.getDeviceStatus() != GoBildaPinpointDriver.DeviceStatus.READY) {
+        while (odo.getDeviceStatus() != GoBildaPinpointDriver.DeviceStatus.READY) {
             Log.d("9010", "Status: " + odo.getDeviceStatus());
             Thread.sleep(10);
             odo.bulkUpdate();
@@ -386,49 +375,49 @@ public class Hardware2024Fred {
         Log.d("9010", "current Heading:  " + startHeading);
 
         double targetXPosition = currenXPosition + x;
-        double targetYPosition =currenYPosition + y;
+        double targetYPosition = currenYPosition + y;
         double targetHeading = startHeading + heading;
 
         //Initialize PID Controller
-        PIDFController lnYPidfCrtler  = new PIDFController(lnKP, lnKI, lnKD, lnKF);
+        PIDFController lnYPidfCrtler = new PIDFController(lnKP, lnKI, lnKD, lnKF);
         Log.d("9010", "lnYKp: " + lnKP + "  lnKI: " + lnKI + " lnKD: " + lnKD);
         //Give X compansation more KP
-        PIDFController lnXPidfCrtler  = new PIDFController(lnKP, lnKI, lnKD, lnKF);
+        PIDFController lnXPidfCrtler = new PIDFController(lnKP, lnKI, lnKD, lnKF);
         Log.d("9010", "lnXKp: " + lnKP + "  lnXKI: " + lnKI + " lnXKD: " + lnKD);
-        PIDFController turnPidfCrtler  = new PIDFController(turnKP, turnKI, turnKD, turnKF);
+        PIDFController turnPidfCrtler = new PIDFController(turnKP, turnKI, turnKD, turnKF);
         Log.d("9010", "turnKp: " + turnKP + "  lnKI: " + turnKI + " turnKD: " + turnKD);
 
         lnYPidfCrtler.setSetPoint(0);
         lnYPidfCrtler.setTolerance(10);
         //set Integration to avoid saturating PID output.
-        lnYPidfCrtler.setIntegrationBounds(-1000 , 1000);
+        lnYPidfCrtler.setIntegrationBounds(-1000, 1000);
 
         lnXPidfCrtler.setSetPoint(0);
         lnXPidfCrtler.setTolerance(10);
-        lnXPidfCrtler.setIntegrationBounds(-1000 , 1000);
+        lnXPidfCrtler.setIntegrationBounds(-1000, 1000);
 
         turnPidfCrtler.setSetPoint(0);
         //Set tolerance as 0.5 degrees
         turnPidfCrtler.setTolerance(1);
-        turnPidfCrtler.setIntegrationBounds(-1 , 1 );
+        turnPidfCrtler.setIntegrationBounds(-1, 1);
 
         Log.d("9010", "Before entering Loop ");
 
         long initMill = System.currentTimeMillis();
 
-        while ( !(lnYPidfCrtler.atSetPoint()&&lnXPidfCrtler.atSetPoint() && turnPidfCrtler.atSetPoint() )
-                && ( (System.currentTimeMillis() -initMill  )< moveTimeOut)  ) {
+        while (!(lnYPidfCrtler.atSetPoint() && lnXPidfCrtler.atSetPoint() && turnPidfCrtler.atSetPoint())
+                && ((System.currentTimeMillis() - initMill) < moveTimeOut)) {
             //Get Odo meter reading
             odo.bulkUpdate();
-            currentPos  = odo.getPosition();
+            currentPos = odo.getPosition();
             /* Log.d ("9010", "odo readings,  X: "   +  currentPos.getX(DistanceUnit.MM)
                     + " Y: " + currentPos.getY(DistanceUnit.MM)
                     + " Heading: " + currentPos.getHeading(AngleUnit.DEGREES) );
             */
             //Reverse X and Y, Gobuilda PinPoint odo meter has X on Foward, and Y on Strafe
-            double velocityXCaculated = lnYPidfCrtler.calculate(targetYPosition -currentPos.getY(DistanceUnit.MM) ) ;
-            double velocityYCaculated = lnXPidfCrtler.calculate(targetXPosition - currentPos.getX(DistanceUnit.MM) );
-            double rx = -turnPidfCrtler.calculate(  targetHeading - currentPos.getHeading(AngleUnit.DEGREES) );
+            double velocityXCaculated = lnYPidfCrtler.calculate(targetYPosition - currentPos.getY(DistanceUnit.MM));
+            double velocityYCaculated = lnXPidfCrtler.calculate(targetXPosition - currentPos.getX(DistanceUnit.MM));
+            double rx = -turnPidfCrtler.calculate(targetHeading - currentPos.getHeading(AngleUnit.DEGREES));
 
             //Log.d("9010", "Error X: " + (targetXPosition - currentPos.getX(DistanceUnit.MM) ) );
             //Log.d("9010", "Error Y: " + (targetYPosition - currentPos.getY(DistanceUnit.MM) ));
@@ -442,7 +431,7 @@ public class Hardware2024Fred {
             // We need to use the field centric formula.
 
             // Rotate the movement direction counter to the bot's rotation
-            double beta = -Math.toRadians (currentPos.getHeading(AngleUnit.DEGREES ) - startHeading) ;
+            double beta = -Math.toRadians(currentPos.getHeading(AngleUnit.DEGREES) - startHeading);
             double rotX = velocityXCaculated * Math.cos(-beta) -
                     velocityYCaculated * Math.sin(-beta);
             double rotY = velocityXCaculated * Math.sin(-beta)
@@ -451,10 +440,10 @@ public class Hardware2024Fred {
             //Log.d("9010", "RotX: " + rotX ) ;
             //Log.d("9010", "rotY " + rotY );
 
-            double frontLeftVelocity = (rotY - rotX + rx) ;
-            double backLeftVelocity = (rotY + rotX + rx) ;
-            double frontRightVelocity = (rotY + rotX - rx) ;
-            double backRightVelocity  = (rotY - rotX - rx) ;
+            double frontLeftVelocity = (rotY - rotX + rx);
+            double backLeftVelocity = (rotY + rotX + rx);
+            double frontRightVelocity = (rotY + rotX - rx);
+            double backRightVelocity = (rotY - rotX - rx);
 
             wheelFrontLeft.setVelocity(frontLeftVelocity);
             wheelBackLeft.setVelocity(backLeftVelocity);
@@ -476,7 +465,6 @@ public class Hardware2024Fred {
     public void closeClaw() {
         claw.setPosition(1);
     }
-
 
 
 }

@@ -6,13 +6,18 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 @Autonomous(name = "LeftAuto")
 public class LeftAuto extends BaseAuto {
+    @Override
+    void moveBeforeSpecimen() {
+
+    }
 
     void park ( ) {
         try {
-            //Wait 5 seconds.
-            Thread.sleep(5000);
-            //Move to right 46 in
-            hdw.moveToXYPosition( 0 ,  -1150  , 0 );
+
+            //Move back 25 in
+            hdw.moveToXYPosition(-625, 0, 0 );
+            //Move right 50 in
+            hdw.moveToXYPosition( 0 ,   1300, 0 );
 
         } catch (InterruptedException e) {
             e.printStackTrace();
