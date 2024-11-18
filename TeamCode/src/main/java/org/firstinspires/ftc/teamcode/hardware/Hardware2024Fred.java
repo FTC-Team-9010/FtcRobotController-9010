@@ -58,9 +58,9 @@ public class Hardware2024Fred {
     private double turnKD = 0.5;
     private double turnKF = 0.0;
 
-    private double lnKP = 15;
-    private double lnKI = 1;
-    private double lnKD = 0.5;
+    private double lnKP = 5;
+    private double lnKI = 2;
+    private double lnKD = 0.8;
     private double lnKF = 0.0;
 
     private double moveTimeOut = 5000;
@@ -281,25 +281,24 @@ public class Hardware2024Fred {
      * @param position
      */
     public void moveSlide(int position) throws InterruptedException {
-
         int targetPosition = vsldieInitPosition + position;
+        Log.d("9010", "TargetPosition: " + targetPosition);
 
         //Move the slide
         int currentPosition = vSlide.getCurrentPosition();
-        //Log.d("9010", "elev position before Move: " + elevation.getCurrentPosition());
+        Log.d("9010", "Slide position before Move: " + vSlide.getCurrentPosition());
 
         int difference = targetPosition - currentPosition;
         Log.d("9010", "slide Diff:  " + difference);
 
         vSlide.setTargetPosition(targetPosition);
         vSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        Log.d("9010", "Set Slide Target position : " + targetPosition);
         vSlide.setPower(0.5);
         while (vSlide.isBusy()) {
             Thread.sleep(100);
         }
         //Put back into run using encoder
-        vSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //vSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
 
@@ -459,7 +458,7 @@ public class Hardware2024Fred {
     }
 
     public void openClaw() {
-        claw.setPosition(0);
+        claw.setPosition(0.65);
     }
 
     public void closeClaw() {

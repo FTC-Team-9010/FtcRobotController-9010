@@ -66,20 +66,23 @@ public abstract class BaseAuto extends LinearOpMode {
         //
         try {
             Log.d("9010", "Into scoreSpicement, before movment.");
-            armRunable.setPosition(1000);
+            hdw.moveToXYPosition(540,0,0);
+            armRunable.setPosition(840);
             //Because it's multithread, give it some time to raise the arm.
             Thread.sleep(500);
             //Extend slide
             hdw.moveSlide(1588);
             //Move forward
-            hdw.moveToXYPosition(250,0,0);
+            hdw.moveToXYPosition(85,0,0);
             //Retract slide a bit
-            hdw.moveSlide(980);
+            hdw.moveSlide(880);
             //Open claw
             hdw.openClaw();
             //Retract Slide all the way
             hdw.moveSlide(0);
             slowLowerArm();
+            //Move back 24 in
+            hdw.moveToXYPosition(-550, 0, 0 );
 
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -91,6 +94,7 @@ public abstract class BaseAuto extends LinearOpMode {
         int armPosition = hdw.getElevation().getCurrentPosition();
         for (int p = armPosition; p > 0 ; p-=10 ) {
             armRunable.setPosition(p);
+            Log.d("9010", "Set arm position: " + p);
             Thread.sleep(50);
         }
     }

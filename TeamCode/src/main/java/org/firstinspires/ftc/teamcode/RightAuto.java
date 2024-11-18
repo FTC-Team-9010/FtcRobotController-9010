@@ -8,16 +8,20 @@ public class RightAuto extends BaseAuto {
 
     @Override
     void moveBeforeSpecimen() {
-
+        //Move left 5 in
+        try {
+            hdw.moveToXYPosition( 0 ,  130 , 0 );
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     void park ( )  {
         try {
-            //Move back 25 in
-            hdw.moveToXYPosition(-625, 0, 0 );
+
             //Move right 60 in
-            hdw.moveToXYPosition( 0 ,  -1524  , 0 );
+            hdw.moveToXYPosition( 0 ,  - 900 , 0 );
 
         } catch (InterruptedException e) {
             e.printStackTrace();
