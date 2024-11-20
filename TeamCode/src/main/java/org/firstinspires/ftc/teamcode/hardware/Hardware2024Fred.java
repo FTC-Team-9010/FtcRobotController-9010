@@ -45,7 +45,7 @@ public class Hardware2024Fred {
     private boolean debug = true;
     private Telemetry telemetry;
 
-    public final int slideUpperLimit = 4000;
+    public final int slideUpperLimit = 4400;
     //2750 is about 1/4 inch longer during inspection on 1st league meet  11/2/2024
     public final int slideHorizontalLimit = 2700;
     public final int elevLimit = 940;
@@ -265,7 +265,7 @@ public class Hardware2024Fred {
 
         //Control  Vslide
         if ((power > 0 && ((elePosition < elevThreadshold && slidePosition < slideHorizontalLimit) ||
-                (elePosition > elevThreadshold && slidePosition < slideUpperLimit)))
+                (elePosition >= elevThreadshold && slidePosition <= slideUpperLimit)))
                 || (power < 0 && slidePosition > 0)) {
             vSlide.setVelocity(power * ANGULAR_RATE);
         } else {
@@ -316,7 +316,7 @@ public class Hardware2024Fred {
         int currentPosition = elevation.getCurrentPosition();
         //Log.d("9010", "elev position before Move: " + elevation.getCurrentPosition());
 
-        if (position > 0 && position < elevLimit){
+        if (position >= 0 && position <= elevLimit){
             if (!elevation.isBusy()) {
                 elevation.setTargetPosition(targetPosition);
                 elevation.setMode(DcMotor.RunMode.RUN_TO_POSITION);

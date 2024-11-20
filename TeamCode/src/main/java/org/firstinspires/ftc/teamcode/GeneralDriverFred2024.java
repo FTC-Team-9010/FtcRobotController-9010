@@ -56,11 +56,17 @@ public class GeneralDriverFred2024 extends LinearOpMode {
             if (gamepad1.left_bumper) {
                 //make it faster move down
                 if ( elevationPosition > 0 ) {
-                    elevationPosition -= 10;
+                    elevationPosition -= 5;
                 }
                 telemetry.clearAll();
                 telemetry.addData("[>]", "Elevation Position: " + elevationPosition);
                 telemetry.update();
+            }
+
+            //Set the arm to elevation for pick up speciman on the wall
+            if (gamepad1.dpad_up) {
+                elevationPosition = 570;
+                //hdw.moveSlide(0);
             }
 
             hdw.goElevation( elevationPosition);
