@@ -18,6 +18,7 @@ public class MecanumWheels2023 {
     //public double frontWheelWeaken = 1;
 
     public double turbo = 0;
+    public double turnCoff = 1;
 
     public MecanumWheels2023(){ }
 
@@ -54,10 +55,10 @@ public class MecanumWheels2023 {
         }
         double rx = gamepad1.right_stick_x;
 
-        wheelFrontLeftPower   = y - x  - rx ;
-        wheelBackLeftPower    = y + x - rx;
-        wheelFrontRightPower  = y + x + rx;
-        wheelBackRightPower   = y - x + rx;
+        wheelFrontLeftPower   = y - x  - (rx * turnCoff) ;
+        wheelBackLeftPower    = y + x - (rx * turnCoff);
+        wheelFrontRightPower  = y + x + (rx * turnCoff);
+        wheelBackRightPower   = y - x + (rx * turnCoff);
 
         double max = Math.max(Math.abs(wheelFrontRightPower), Math.max(Math.abs(wheelBackRightPower),
                 Math.max(Math.abs(wheelFrontLeftPower), Math.abs(wheelBackLeftPower))));

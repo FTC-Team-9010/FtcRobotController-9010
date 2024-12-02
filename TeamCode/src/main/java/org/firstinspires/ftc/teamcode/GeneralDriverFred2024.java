@@ -29,7 +29,9 @@ public class GeneralDriverFred2024 extends LinearOpMode {
         telemetry.clearAll();
 
         int elevationPosition = 0;
-        double turbo = 1;
+        //change robot speed in normal mode
+        double turbo = .6;
+        robotWheel.turnCoff = 1;
 
         //This is the main loop of operation.
         while (opModeIsActive()) {
@@ -65,7 +67,7 @@ public class GeneralDriverFred2024 extends LinearOpMode {
 
             //Set the arm to elevation for pick up speciman on the wall
             if (gamepad1.dpad_up) {
-                elevationPosition = 570;
+                elevationPosition = 520;
                 //hdw.moveSlide(0);
             }
 
@@ -81,7 +83,7 @@ public class GeneralDriverFred2024 extends LinearOpMode {
             }
 
             if (gamepad1.a) {
-                turbo = 1;
+                turbo = .6;
                 telemetry.clearAll();
                 telemetry.addData("[>]", "Turbo:  " + turbo);
                 telemetry.update();

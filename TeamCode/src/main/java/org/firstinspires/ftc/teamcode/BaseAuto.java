@@ -47,8 +47,8 @@ public abstract class BaseAuto extends LinearOpMode {
         armThread.start();
         Log.d("9010", "new thread running");
 
-        moveBeforeSpecimen();
-        scoreSpecimen ();
+        //moveBeforeSpecimen();
+        //scoreSpecimen ();
         park();
 
         //Stop the arm thread.
