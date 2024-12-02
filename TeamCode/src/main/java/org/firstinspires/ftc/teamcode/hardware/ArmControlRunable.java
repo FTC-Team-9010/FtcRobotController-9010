@@ -77,7 +77,7 @@ public class ArmControlRunable implements Runnable {
                 //Only set if difference is large otherwise do nothing.
                 elevation.setTargetPosition(targetPosition);
                 elevation.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                Log.d("9010", "Set Target position : " + targetPosition);
+                //Log.d("9010", "Set Target position : " + targetPosition);
                 elevation.setPower(0.7);
             } else {
                 //Log.d("9010", "Motor busy!");

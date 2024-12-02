@@ -47,14 +47,30 @@ public abstract class BaseAuto extends LinearOpMode {
         armThread.start();
         Log.d("9010", "new thread running");
 
-        //moveBeforeSpecimen();
-        //scoreSpecimen ();
+        raiseArm();
+        moveBeforeSpecimen();
+        scoreSpecimen ();
         park();
 
         //Stop the arm thread.
         armRunable.setShallRun(false);
         Log.d("9010", "Now put thread run = false ");
         idle();
+    }
+
+    /**
+     * Raise the arm, it's used before move.
+     */
+    void raiseArm () {
+
+         try {
+             //Raiase the arm before move.
+             armRunable.setPosition(300);
+             //Because it's multithread, give it some time to raise the arm.
+             Thread.sleep(500);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -66,14 +82,14 @@ public abstract class BaseAuto extends LinearOpMode {
         //
         try {
             Log.d("9010", "Into scoreSpicement, before movment.");
-            hdw.moveToXYPosition(540,0,0);
+            hdw.moveToXYPosition(450,0,0);
+            //raise arm to position for scoring.
             armRunable.setPosition(840);
-            //Because it's multithread, give it some time to raise the arm.
             Thread.sleep(500);
             //Extend slide
-            hdw.moveSlide(1588);
+            hdw.moveSlide(1600);
             //Move forward
-            hdw.moveToXYPosition(85,0,0);
+            hdw.moveToXYPosition(70,0,0);
             //Retract slide a bit
             hdw.moveSlide(880);
             //Open claw
@@ -82,7 +98,7 @@ public abstract class BaseAuto extends LinearOpMode {
             hdw.moveSlide(0);
             slowLowerArm();
             //Move back 24 in
-            hdw.moveToXYPosition(-550, 0, 0 );
+            hdw.moveToXYPosition(-530, 0, 0 );
 
         } catch (InterruptedException e) {
             e.printStackTrace();

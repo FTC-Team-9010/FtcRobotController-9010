@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
+import org.firstinspires.ftc.teamcode.hardware.ArmControlRunable;
 import org.firstinspires.ftc.teamcode.hardware.Hardware2024Fred;
 
 
@@ -13,7 +14,7 @@ import org.firstinspires.ftc.teamcode.hardware.Hardware2024Fred;
 public class HWTestTele  extends LinearOpMode {
     Hardware2024Fred hdw;
 
-    double[] pidCoffs = { 5,2,0.8 };
+    double[] pidCoffs = { 3.5,0.8,1.4 };
     int pidCoffIndex = 0;
 
     @Override
@@ -25,12 +26,20 @@ public class HWTestTele  extends LinearOpMode {
         telemetry.addData("[>]", "All set?");
         telemetry.update();
 
+        Log.d("9010", "Before create thread!");
+        ArmControlRunable armRunable = new ArmControlRunable( hdw.getElevation(), hdw.getElevInitPosition());
+        Thread armThread = new Thread(armRunable);
+        armThread.start();
+        Log.d("9010", "new thread running");
+
+        armRunable.setPosition(300);
 
         waitForStart();
         telemetry.clearAll();
 
         Gamepad previousGamePad1 = new Gamepad();
         Gamepad currentGamePad1 = new Gamepad();
+
 
         //This is the main loop of operation.
         while (opModeIsActive()) {
@@ -43,13 +52,13 @@ public class HWTestTele  extends LinearOpMode {
                 hdw.setLnKP(pidCoffs[0]);
                 hdw.setLnKI(pidCoffs[1]);
                 hdw.setLnKD(pidCoffs[2]);
-                hdw.moveToXYPosition(0, 400, 0 );
+                hdw.moveToXYPosition(0, 1200, 0 );
             }
             if (gamepad1.dpad_right) {
                 hdw.setLnKP(pidCoffs[0]);
                 hdw.setLnKI(pidCoffs[1]);
                 hdw.setLnKD(pidCoffs[2]);
-                hdw.moveToXYPosition(0,  -200 ,  0);
+                hdw.moveToXYPosition(0,  -1200 ,  0);
             }
             if (gamepad1.dpad_up) {
                 telemetry.addLine().addData("[moving y >]  ", " Y ");
@@ -57,13 +66,13 @@ public class HWTestTele  extends LinearOpMode {
                 hdw.setLnKP(pidCoffs[0]);
                 hdw.setLnKI(pidCoffs[1]);
                 hdw.setLnKD(pidCoffs[2]);
-                hdw.moveToXYPosition(500, 0 , 0 );
+                hdw.moveToXYPosition(450, 0 , 0 );
             }
             if (gamepad1.dpad_down) {
                 hdw.setLnKP(pidCoffs[0]);
                 hdw.setLnKI(pidCoffs[1]);
                 hdw.setLnKD(pidCoffs[2]);
-                hdw.moveToXYPosition (-500, 0, 0 );
+                hdw.moveToXYPosition (-450, 0, 0 );
             }
 
 

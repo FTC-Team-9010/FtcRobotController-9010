@@ -58,9 +58,9 @@ public class Hardware2024Fred {
     private double turnKD = 0.5;
     private double turnKF = 0.0;
 
-    private double lnKP = 5;
-    private double lnKI = 2;
-    private double lnKD = 0.8;
+    private double lnKP = 3.5;
+    private double lnKI = 0.8;
+    private double lnKD = 1.4;
     private double lnKF = 0.0;
 
     private double moveTimeOut = 7000;
