@@ -458,11 +458,11 @@ public class Hardware2024Fred {
     }
 
     public void openClaw() {
-        claw.setPosition(0.65);
+        claw.setPosition(0.50);
     }
 
     public void closeClaw() {
-        claw.setPosition(1);
+        claw.setPosition(0.85);
     }
 
 
