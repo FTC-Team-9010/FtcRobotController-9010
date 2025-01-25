@@ -60,14 +60,14 @@ public class GeneralDriver extends LinearOpMode {
                  */
 
             }
-                hdw.freeMoveVerticalSlide(gamepad1.right_trigger - gamepad1.left_trigger);
+                //hdw.freeMoveVerticalSlide(gamepad1.right_trigger - gamepad1.left_trigger);
 
                 //Wheel takes input of gampad 1  ,  turbo is the power factor. Range 0-1 , 1 is 100%
                 robotWheel.joystick(gamepad1, 1);
 
                 /* Set the calcuated velocity to wheels according to the gampad input */
                 double frontLeftVelocity = robotWheel.wheelFrontLeftPower * powerDrivePercentage * Hardware2022.ANGULAR_RATE;
-                double backLeftVelocity = robotWheel.wheelBackLeftPower * powerDrivePercentage * Hardware2022.ANGULAR_RATE;
+                double backLeftVelocity = robotWheel.wheelBackLeftPower * powerDrivePercentage * Hardware2022.ANGULAR_RATE * .7;
                 double frontRightVelocity = robotWheel.wheelFrontRightPower * powerDrivePercentage * Hardware2022.ANGULAR_RATE;
                 double backRightVelocity = robotWheel.wheelBackRightPower * powerDrivePercentage * Hardware2022.ANGULAR_RATE;
 
