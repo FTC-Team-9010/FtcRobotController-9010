@@ -1,11 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.util.Log;
-
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous(name = "LeftAuto")
-public class LeftAuto extends BaseAuto {
+@Autonomous(name = "LeftNoPark")
+public class LeftNoParkAuto extends BaseAuto{
     @Override
     void moveBeforeSpecimen() {
         //Move right 5 in
@@ -18,13 +16,6 @@ public class LeftAuto extends BaseAuto {
     }
 
     void park ( ) {
-        try {
-            //Move right 50 in
-            hdw.moveToXYPosition( 25 ,   -1300, 0 );
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
     }
 

@@ -21,7 +21,7 @@ public class RightAuto extends BaseAuto {
         try {
 
             //Move right 60 in
-            hdw.moveToXYPosition( 0 ,  - 900 , 0 );
+            hdw.moveToXYPosition( 25 ,  - 950 , 0 );
 
         } catch (InterruptedException e) {
             e.printStackTrace();

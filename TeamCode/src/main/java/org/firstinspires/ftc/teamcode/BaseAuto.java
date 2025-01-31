@@ -87,9 +87,9 @@ public abstract class BaseAuto extends LinearOpMode {
             armRunable.setPosition(840);
             Thread.sleep(500);
             //Extend slide
-            hdw.moveSlide(1600);
+            hdw.moveSlide(1750);
             //Move forward
-            hdw.moveToXYPosition(70,0,0);
+            hdw.moveToXYPosition(75,0,0);
             //Retract slide a bit
             hdw.moveSlide(880);
             //Open claw
@@ -108,7 +108,7 @@ public abstract class BaseAuto extends LinearOpMode {
 
     void slowLowerArm () throws InterruptedException {
         int armPosition = hdw.getElevation().getCurrentPosition();
-        for (int p = armPosition; p > 0 ; p-=5 ) {
+        for (int p = armPosition; p > 0 ; p-=6 ) {
             armRunable.setPosition(p);
             Log.d("9010", "Set arm position: " + p);
             Thread.sleep(50);
