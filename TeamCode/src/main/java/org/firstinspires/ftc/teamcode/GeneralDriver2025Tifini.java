@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.hardware.Hardware2025Tifini;
 import org.firstinspires.ftc.teamcode.hardware.MecanumWheels2023;
@@ -28,7 +29,17 @@ public class GeneralDriver2025Tifini extends LinearOpMode {
         waitForStart();
         telemetry.clearAll();
 
+        Gamepad currentGamePad1 = new Gamepad();
+        Gamepad previousGamePad1 = new Gamepad();
+
+        currentGamePad1.copy(gamepad1);
         while (opModeIsActive()) {
+
+            //Record previous Gamepad Status
+            previousGamePad1.copy(currentGamePad1);
+            //Update current gamepad status
+            currentGamePad1.copy(gamepad1);
+
 
             robotWheel.joystick(gamepad1, turbo);
 
@@ -37,12 +48,15 @@ public class GeneralDriver2025Tifini extends LinearOpMode {
             hdw.wheelFrontRight.setVelocity(robotWheel.wheelFrontRightPower *  Hardware2025Tifini.ANGULAR_RATE );
             hdw.wheelBackRight.setVelocity(robotWheel.wheelBackRightPower *  Hardware2025Tifini.ANGULAR_RATE );
 
+            if (!previousGamePad1.x & currentGamePad1.x) {
+                if ( !hdw.intakeWheelOff() ) {
+                    hdw.intakeWheelOn();
+                } else {
+                    hdw.intakeWheelOff();
+                }
 
-            if (gamepad1.left_bumper) {
-                hdw.intakeWheelOn();
-            }
-            if (gamepad1.right_bumper) {
-                hdw.intakeWheelOff();
+
+
             }
         }
     }

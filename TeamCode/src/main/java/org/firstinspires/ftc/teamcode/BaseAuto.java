@@ -104,7 +104,7 @@ public abstract class BaseAuto extends LinearOpMode {
             e.printStackTrace();
         }
 
-    }
+     }
 
     void slowLowerArm () throws InterruptedException {
         int armPosition = hdw.getElevation().getCurrentPosition();

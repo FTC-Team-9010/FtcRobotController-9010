@@ -305,12 +305,14 @@ public class Hardware2025Tifini {
         wheelBackLeft.setVelocity(0);
 
     }
-        public void intakeWheelOn() {
+        public boolean intakeWheelOn() {
         intakeWheel.setPower(1);
+        return true;
     }
 
-    public void intakeWheelOff() {
+    public boolean intakeWheelOff() {
         intakeWheel.setPower(0);
+        return true;
     }
 }
 
