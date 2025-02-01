@@ -27,7 +27,8 @@ public class HWTestTele  extends LinearOpMode {
         telemetry.update();
 
         Log.d("9010", "Before create thread!");
-        ArmControlRunable armRunable = new ArmControlRunable( hdw.getElevation(), hdw.getElevInitPosition());
+        ArmControlRunable armRunable = new ArmControlRunable( hdw.getElevation(),
+                hdw.getElevInitPosition( ), this) ;
         Thread armThread = new Thread(armRunable);
         armThread.start();
         Log.d("9010", "new thread running");

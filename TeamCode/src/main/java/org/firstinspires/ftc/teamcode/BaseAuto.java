@@ -42,7 +42,7 @@ public abstract class BaseAuto extends LinearOpMode {
         waitForStart();
         //Create a thread to control the arm position.
         Log.d("9010", "Before create thread!");
-        armRunable = new ArmControlRunable( hdw.getElevation(), hdw.getElevInitPosition());
+        armRunable = new ArmControlRunable( hdw.getElevation(), hdw.getElevInitPosition(), this);
         Thread armThread = new Thread(armRunable);
         armThread.start();
         Log.d("9010", "new thread running");

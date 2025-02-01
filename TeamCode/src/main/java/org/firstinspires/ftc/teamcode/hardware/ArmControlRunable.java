@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.hardware;
 
 import android.util.Log;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 /**
@@ -18,11 +19,13 @@ public class ArmControlRunable implements Runnable {
 
     private int eleInitPosition;
     private int position;
+    private LinearOpMode opMode ;
 
-    public ArmControlRunable(DcMotor ele, int eleInitPosition) {
+    public ArmControlRunable(DcMotor ele, int eleInitPosition, LinearOpMode baseAutoMode) {
         this.elevation = ele;
         this.eleInitPosition = eleInitPosition;
         this.position = 0;
+        this.opMode = baseAutoMode;
     }
 
     public boolean isShallRun() {
@@ -61,7 +64,7 @@ public class ArmControlRunable implements Runnable {
     public void run() {
         Log.d("9010", "Into armThread");
 
-        while (this.shallRun == true) {
+        while (this.shallRun == true && this.opMode.opModeIsActive()) {
 
             int targetPosition = eleInitPosition + position;
             //Move the slide

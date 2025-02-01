@@ -45,7 +45,7 @@ public class Hardware2024Fred {
     private boolean debug = true;
     private Telemetry telemetry;
 
-    public final int slideUpperLimit = 4400;
+    public final int slideUpperLimit = 4200;
     //2750 is about 1/4 inch longer during inspection on 1st league meet  11/2/2024
     public final int slideHorizontalLimit = 2650;
     public final int elevLimit = 940;
@@ -457,12 +457,13 @@ public class Hardware2024Fred {
 
     }
 
+    //Number decrease will open wider.
     public void openClaw() {
-        claw.setPosition(0.40);
+        claw.setPosition(0.35);
     }
 
     public void closeClaw() {
-        claw.setPosition(0.70);
+        claw.setPosition(0.60);
     }
 
 
