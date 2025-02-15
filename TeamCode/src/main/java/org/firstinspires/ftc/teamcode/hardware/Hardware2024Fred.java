@@ -47,7 +47,8 @@ public class Hardware2024Fred {
 
     public final int slideUpperLimit = 4200;
     //2750 is about 1/4 inch longer during inspection on 1st league meet  11/2/2024
-    public final int slideHorizontalLimit = 2650;
+    // 1 inch = 200
+    public final int slideHorizontalLimit = 2450;
     public final int elevLimit = 940;
     //Only allow slide to extend longer after passthing this threashold.
     public final int elevThreadshold = 900;
