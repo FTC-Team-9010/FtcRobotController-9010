@@ -22,6 +22,7 @@ public class Hardware2025Tifini {
     private final double yAxisCoeff = 216.5;  // How many degrees encoder to turn to run an inch in Y Axis
 
     static public double ANGULAR_RATE = 2000;
+    static public double slideUpperLimit = 2000;
 
     private boolean debug = true;
     private Telemetry telemetry;
@@ -128,6 +129,7 @@ public class Hardware2025Tifini {
 
     //servos
     public CRServo intakeWheel = null;
+    public Servo toggleLock = null;
 
 
     public void createHardware() {
@@ -142,6 +144,7 @@ public class Hardware2025Tifini {
         hSlide = hwMap.get(DcMotorEx.class, "hSlide");
 
         intakeWheel = hwMap.get(CRServo.class, "intakeWheel");
+        toggleLock = hwMap.get(Servo.class, "toggleLock");
 
         //TODO: Modify these later
         wheelFrontLeft.setDirection(DcMotor.Direction.FORWARD);
@@ -163,7 +166,6 @@ public class Hardware2025Tifini {
         hSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
-
         wheelFrontRight.setVelocity(0);
         wheelBackRight.setVelocity(0);
         wheelFrontLeft.setVelocity(0);
@@ -172,8 +174,39 @@ public class Hardware2025Tifini {
         vSlideRight.setVelocity(0);
         vSlideLeft.setVelocity(0);
 
+        //init GoBuilda Odameter
+        odo = hwMap.get(GoBildaPinpointDriver.class, "odo");
 
+        /*
+          Please refer to Go Builder Example.
+         */
+        //TODO: Modidfy these offsets to match Tifini2025
+        //
+        odo.setOffsets(-100.0, 0); //these are tuned for 3110-0002-0001 Product Insight #1
 
+        /*
+        Set the kind of pods used by your robot. If you're using goBILDA odometry pods, select either
+        the goBILDA_SWINGARM_POD, or the goBILDA_4_BAR_POD.
+        If you're using another kind of odometry pod, uncomment setEncoderResolution and input the
+        number of ticks per mm of your odometry pod.
+         */
+        odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+
+        /*
+          Please refer to Go Builder Example.
+         */
+        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD,
+                GoBildaPinpointDriver.EncoderDirection.REVERSED);
+
+        /*
+        Before running the robot, recalibrate the IMU. This needs to happen when the robot is stationary
+        The IMU will automatically calibrate when first powered on, but recalibrating before running
+        the robot is a good idea to ensure that the calibration is "good".
+        resetPosAndIMU will reset the position to 0,0,0 and also recalibrate the IMU.
+        This is recommended before you run your autonomous, as a bad initial calibration can cause
+        an incorrect starting value for x, y, and heading.
+         */
+        odo.resetPosAndIMU();
 
 
     }
@@ -305,7 +338,8 @@ public class Hardware2025Tifini {
         wheelBackLeft.setVelocity(0);
 
     }
-        public boolean intakeWheelOn() {
+
+    public boolean intakeWheelOn() {
         intakeWheel.setPower(1);
         return true;
     }
@@ -314,5 +348,28 @@ public class Hardware2025Tifini {
         intakeWheel.setPower(0);
         return true;
     }
+
+    public void hSlideExtend() {
+        toggleLock.setPosition(0.1);
+
+    }
+
+    public void hSlideRetract() {
+        toggleLock.setPosition(0.9);
+
+    }
+
+    public void freeMoveVerticalSlide(float power) {
+        double slidePosition = vSlideRight.getCurrentPosition();
+        if ((power > 0 && slidePosition < slideUpperLimit) || (power < 0 && slidePosition > 0)) {
+            vSlideRight.setVelocity(power * ANGULAR_RATE);
+            vSlideLeft.setVelocity(power * ANGULAR_RATE);
+        } else {
+            vSlideRight.setVelocity(0);
+            vSlideLeft.setVelocity(0);
+        }
+
+    }
+
 }
 

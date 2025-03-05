@@ -48,7 +48,7 @@ public class GeneralDriver2025Tifini extends LinearOpMode {
             hdw.wheelFrontRight.setVelocity(robotWheel.wheelFrontRightPower *  Hardware2025Tifini.ANGULAR_RATE );
             hdw.wheelBackRight.setVelocity(robotWheel.wheelBackRightPower *  Hardware2025Tifini.ANGULAR_RATE );
 
-            if (!previousGamePad1.x & currentGamePad1.x) {
+            if (!previousGamePad1.x && currentGamePad1.x) {
                 if ( !hdw.intakeWheelOff() ) {
                     hdw.intakeWheelOn();
                 } else {
@@ -58,6 +58,18 @@ public class GeneralDriver2025Tifini extends LinearOpMode {
 
 
             }
+
+            if (currentGamePad1.a) {
+                hdw.hSlideExtend();
+            }
+
+            if (currentGamePad1.b) {
+                hdw.hSlideRetract();
+            }
+
+            hdw.freeMoveVerticalSlide(gamepad1.right_trigger - gamepad1.left_trigger);
+
+
         }
     }
 
