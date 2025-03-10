@@ -129,7 +129,8 @@ public class Hardware2025Tifini {
 
     //servos
     public CRServo intakeWheel = null;
-    public Servo toggleLock = null;
+    public Servo toggleLock1 = null;
+    public Servo toggleLock2 = null;
 
 
     public void createHardware() {
@@ -144,7 +145,8 @@ public class Hardware2025Tifini {
         hSlide = hwMap.get(DcMotorEx.class, "hSlide");
 
         intakeWheel = hwMap.get(CRServo.class, "intakeWheel");
-        toggleLock = hwMap.get(Servo.class, "toggleLock");
+        toggleLock1 = hwMap.get(Servo.class, "toggleLock1");
+        toggleLock2 = hwMap.get(Servo.class, "toggleLock2");
 
         //TODO: Modify these later
         wheelFrontLeft.setDirection(DcMotor.Direction.FORWARD);
@@ -181,8 +183,7 @@ public class Hardware2025Tifini {
           Please refer to Go Builder Example.
          */
         //TODO: Modidfy these offsets to match Tifini2025
-        //
-        odo.setOffsets(-100.0, 0); //these are tuned for 3110-0002-0001 Product Insight #1
+        odo.setOffsets(85, -125);
 
         /*
         Set the kind of pods used by your robot. If you're using goBILDA odometry pods, select either
@@ -196,7 +197,7 @@ public class Hardware2025Tifini {
           Please refer to Go Builder Example.
          */
         odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD,
-                GoBildaPinpointDriver.EncoderDirection.REVERSED);
+                GoBildaPinpointDriver.EncoderDirection.FORWARD);
 
         /*
         Before running the robot, recalibrate the IMU. This needs to happen when the robot is stationary
@@ -207,7 +208,6 @@ public class Hardware2025Tifini {
         an incorrect starting value for x, y, and heading.
          */
         odo.resetPosAndIMU();
-
 
     }
 
@@ -350,12 +350,14 @@ public class Hardware2025Tifini {
     }
 
     public void hSlideExtend() {
-        toggleLock.setPosition(0.1);
+        toggleLock1.setPosition(0.1);
+        toggleLock2.setPosition(0.1);
 
     }
 
     public void hSlideRetract() {
-        toggleLock.setPosition(0.9);
+        toggleLock1.setPosition(0.9);
+        toggleLock2.setPosition(0.9);
 
     }
 
