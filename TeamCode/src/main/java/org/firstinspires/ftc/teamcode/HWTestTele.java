@@ -8,11 +8,12 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.hardware.ArmControlRunable;
 import org.firstinspires.ftc.teamcode.hardware.Hardware2024Fred;
+import org.firstinspires.ftc.teamcode.hardware.Hardware2025Tifini;
 
 
 @TeleOp(name="HDWTestOp", group="TeleOps")
 public class HWTestTele  extends LinearOpMode {
-    Hardware2024Fred hdw;
+    Hardware2025Tifini hdw;
 
     double[] pidCoffs = { 3.5,0.8,1.4 };
     int pidCoffIndex = 0;
@@ -20,12 +21,13 @@ public class HWTestTele  extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        hdw = new Hardware2024Fred(hardwareMap, telemetry); //init hardware
+        hdw = new Hardware2025Tifini(hardwareMap, telemetry); //init hardware
         hdw.createHardware();
 
         telemetry.addData("[>]", "All set?");
         telemetry.update();
 
+        /*
         Log.d("9010", "Before create thread!");
         ArmControlRunable armRunable = new ArmControlRunable( hdw.getElevation(),
                 hdw.getElevInitPosition( ), this) ;
@@ -35,6 +37,7 @@ public class HWTestTele  extends LinearOpMode {
 
         armRunable.setPosition(300);
 
+         */
         waitForStart();
         telemetry.clearAll();
 
