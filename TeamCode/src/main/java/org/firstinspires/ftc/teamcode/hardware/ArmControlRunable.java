@@ -60,12 +60,12 @@ public class ArmControlRunable implements Runnable {
         this.position = position;
     }
 
+
     @Override
     public void run() {
         Log.d("9010", "Into armThread");
 
         while (this.shallRun == true && this.opMode.opModeIsActive()) {
-
             int targetPosition = eleInitPosition + position;
             //Move the slide
             int currentPosition = elevation.getCurrentPosition();
@@ -78,7 +78,26 @@ public class ArmControlRunable implements Runnable {
             //if it's not busy, send new position command
             if (!elevation.isBusy()) {
                 //Only set if difference is large otherwise do nothing.
-                elevation.setTargetPosition(targetPosition);
+                if ( difference < 0 ) {
+                    //If lower down, get to target slowly.
+                    if ( difference < -10 ) {
+                        Log.d("9010", "Slow lowering, current position:  " + currentPosition );
+                        elevation.setTargetPosition( currentPosition - 10 );
+
+                        try {
+                            Thread.sleep(10);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    } else {
+                        Log.d("9010", "lowering directly, target position:  " + targetPosition );
+                        elevation.setTargetPosition(targetPosition );
+                    }
+
+                } else {
+                    //If lifting up, just set to targer directly.
+                    elevation.setTargetPosition(targetPosition);
+                }
                 elevation.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 //Log.d("9010", "Set Target position : " + targetPosition);
                 elevation.setPower(0.7);
