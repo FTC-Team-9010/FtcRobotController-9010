@@ -90,7 +90,7 @@ public abstract class BaseAuto extends LinearOpMode {
             //Extend slide
             hdw.moveSlide(1750);
             //Move forward
-            hdw.moveToXYPosition(65,0,0);
+            hdw.moveToXYPosition(50,0,0);
             //Retract slide a bit
             hdw.moveSlide(950);
             //Open cla
