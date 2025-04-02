@@ -80,12 +80,12 @@ public class ArmControlRunable implements Runnable {
                 //Only set if difference is large otherwise do nothing.
                 if ( difference < 0 ) {
                     //If lower down, get to target slowly.
-                    if ( difference < -10 ) {
+                    if ( difference < -30 ) {
                         Log.d("9010", "Slow lowering, current position:  " + currentPosition );
-                        elevation.setTargetPosition( currentPosition - 10 );
+                        elevation.setTargetPosition( currentPosition - 30 );
 
                         try {
-                            Thread.sleep(10);
+                            Thread.sleep(5);
                         } catch (InterruptedException e) {
                             throw new RuntimeException(e);
                         }

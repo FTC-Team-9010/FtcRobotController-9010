@@ -50,6 +50,7 @@ public abstract class BaseAuto extends LinearOpMode {
         raiseArm();
         moveBeforeSpecimen();
         scoreSpecimen ();
+
         park();
 
         //Stop the arm thread.
@@ -82,23 +83,21 @@ public abstract class BaseAuto extends LinearOpMode {
         //
         try {
             Log.d("9010", "Into scoreSpicement, before movment.");
-            hdw.moveToXYPosition(450,0,0);
+
             //raise arm to position for scoring.
             armRunable.setPosition(840);
             Thread.sleep(500);
             //Extend slide
             hdw.moveSlide(1750);
             //Move forward
-            hdw.moveToXYPosition(75,0,0);
+            hdw.moveToXYPosition(65,0,0);
             //Retract slide a bit
-            hdw.moveSlide(880);
-            //Open claw
+            hdw.moveSlide(950);
+            //Open cla
             hdw.openClaw();
             //Retract Slide all the way
             hdw.moveSlide(0);
             armRunable.setPosition(0);
-            //Move back 24 in
-            hdw.moveToXYPosition(-530, 0, 0 );
 
         } catch (InterruptedException e) {
             e.printStackTrace();
