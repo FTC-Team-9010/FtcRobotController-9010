@@ -23,6 +23,7 @@ public class Hardware2026 {
     //declare GoBuilda Odometry
     GoBildaPinpointDriver odo;
 
+    //TODO: Recalibrate these PID values for the next robot
     private double turnKP = 15;
     private double turnKI = 1;
     private double turnKD = 0.5;
