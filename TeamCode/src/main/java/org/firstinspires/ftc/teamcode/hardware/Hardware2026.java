@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.hardware;
 import android.util.Log;
 
 import com.arcrobotics.ftclib.controller.PIDFController;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -49,7 +50,13 @@ public class Hardware2026 {
 
 
 
-    public DcMotorEx intake = null;
+    //public DcMotorEx intake = null;
+
+    //public DcMotorEx carousel = null;
+
+    //sensors
+    //public ColorSensor colorSensor = null;
+
 
     public void createHardware() {
         wheelFrontRight = hwMap.get(DcMotorEx.class,"rfWheel");
@@ -66,6 +73,9 @@ public class Hardware2026 {
         wheelBackRight.setVelocity(0);
         wheelFrontLeft.setVelocity(0);
         wheelBackLeft.setVelocity(0);
+
+        //intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        //carousel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         //init GoBuilda Odameter
         odo = hwMap.get(GoBildaPinpointDriver.class, "odo");
@@ -217,4 +227,17 @@ public class Hardware2026 {
 
 
     }
+
+    /*
+    public void intakeOn() {
+        intake.setPower(1);
+    }
+
+    public void intakeOff() {
+        intake.setPower(0);
+    }
+
+     */
+
+
 }
