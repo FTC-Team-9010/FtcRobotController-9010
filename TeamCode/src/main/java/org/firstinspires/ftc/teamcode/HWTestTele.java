@@ -5,8 +5,10 @@ import android.util.Log;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.hardware.ArmControlRunable;
+import org.firstinspires.ftc.teamcode.hardware.CarouelController;
 import org.firstinspires.ftc.teamcode.hardware.Hardware2024Fred;
 import org.firstinspires.ftc.teamcode.hardware.Hardware2025Tifini;
 
@@ -123,6 +125,7 @@ public class HWTestTele  extends LinearOpMode {
                 telemetry.update();
                 sleep(100);
             }
+
         }
     }
 

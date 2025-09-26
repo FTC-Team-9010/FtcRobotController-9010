@@ -179,6 +179,8 @@ public class ColorSensorTest2024 extends LinearOpMode {
                         .addData("Saturation", "%.3f", hsvValues[1])
                         .addData("Value", "%.3f", hsvValues[2]);
                 telemetry.addData("Alpha", "%.3f", colors.alpha);
+                telemetry.addData("gain", "%.3f", gain);
+
 
                 /* If this color sensor also has a distance sensor, display the measured distance.
                  * Note that the reported distance is only useful at very close range, and is impacted by
