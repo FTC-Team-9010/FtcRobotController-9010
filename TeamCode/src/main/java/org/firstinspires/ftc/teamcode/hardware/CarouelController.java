@@ -63,23 +63,27 @@ public class CarouelController {
         Log.d("9010:", "Carousel Current Position: " + currentPosition);
 
 
+        if ( meg.isPressed()) {
+            return;
+        }
 
         //Start spining
-        carouel.setVelocity(-700);
+        carouel.setVelocity(-500);
         while (!meg.isPressed()) {
             currentPosition = carouel.getCurrentPosition();
             //Log.d("9010","Position with MagLimit" + currentPosition);
         }
         carouel.setVelocity(0);
 
-        //Start spining
-        carouel.setVelocity(80);
         try {
-            Thread.sleep(1000);
+            Thread.sleep(500);
         } catch (Exception ex) {
             //DO nothing.
             Log.d("9010", ex.toString());
         }
+        //Start spining in reverse, but slower.
+        carouel.setVelocity(80);
+
         while (!meg.isPressed()) {
             currentPosition = carouel.getCurrentPosition();
             Log.d("9010","Position with MagLimit backward" + currentPosition);
