@@ -18,7 +18,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 public class CarouelController {
 
-    private double turnKP = 7.5;
+    private double turnKP = 7;
     private double turnKI = .8;
     private double turnKD = 0.002;
     private double turnKF = 0.0;
@@ -163,7 +163,7 @@ public class CarouelController {
 
     }
 
-    private void rotateOneSlotCCW() {
+    public void rotateOneSlotCCW() {
         PIDFController turnPidfCrtler = new PIDFController(turnKP, turnKI, turnKD, turnKF);
         Log.d("9010", "turnKp: " + turnKP + "  lnKI: " + turnKI + " turnKD: " + turnKD);
         turnPidfCrtler.setSetPoint(0);
@@ -182,7 +182,7 @@ public class CarouelController {
         Log.d("9010", "target: " + targtPosition);
 
         while ( !turnPidfCrtler.atSetPoint()) {
-            double calculatedV =  turnPidfCrtler.calculate(targtPosition - carouel.getCurrentPosition());
+            double calculatedV = - turnPidfCrtler.calculate(targtPosition - carouel.getCurrentPosition());
             //Log.d("9010","calV: " + calculatedV + " pos: " + carouel.getCurrentPosition());
             carouel.setVelocity(calculatedV);
         }

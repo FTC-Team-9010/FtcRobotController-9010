@@ -13,7 +13,7 @@ public class CarouselTestTele extends LinearOpMode {
     Hardware2026 hdw;
     CarouelController car;
 
-    double[] pidCoffs = { 7.5,0.8,0.002 };
+    double[] pidCoffs = { 7,0.8,0.002 };
     int pidCoffIndex = 0;
 
 
@@ -27,11 +27,16 @@ public class CarouselTestTele extends LinearOpMode {
 
             if (gamepad1.back) {
                 car.initPosition();
-            } else if ( gamepad1.b) {
+            } else if ( gamepad1.dpad_left) {
                 car.setTurnKP(pidCoffs[0]);
                 car.setTurnKI(pidCoffs[1]);
                 car.setTurnKD(pidCoffs[2]);
                 car.rotateOneSlotCW();
+            } else if (gamepad1.dpad_right){
+                car.setTurnKP(pidCoffs[0]);
+                car.setTurnKI(pidCoffs[1]);
+                car.setTurnKD(pidCoffs[2]);
+                car.rotateOneSlotCCW();
             }
 
             if( gamepad1.x) {
