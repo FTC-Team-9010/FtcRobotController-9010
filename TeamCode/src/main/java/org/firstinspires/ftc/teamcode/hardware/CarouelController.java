@@ -135,12 +135,6 @@ public class CarouelController {
      * Rotate clock wise for 120 degrees.
      */
     public void rotateOneSlotCW() {
-        PIDFController turnPidfCrtler = new PIDFController(turnKP, turnKI, turnKD, turnKF);
-        Log.d("9010", "turnKp: " + turnKP + "  lnKI: " + turnKI + " turnKD: " + turnKD);
-        turnPidfCrtler.setSetPoint(0);
-        //Set tolerance as 0.5 degrees
-        turnPidfCrtler.setTolerance(2);
-        turnPidfCrtler.setIntegrationBounds(-20, 20);
 
         int startPosition =  carouel.getCurrentPosition();
         //Figure out if initial position inside which slot.
@@ -149,11 +143,32 @@ public class CarouelController {
         int regulatedCurrentPosition = currentSlotNumber* (oneCircle/3);
         Log.d("9010",  " start Position: " + startPosition + "Regulated start: " + regulatedCurrentPosition);
 
-        int targtPosition =  regulatedCurrentPosition +  oneCircle/3  ;
-        Log.d("9010", "target: " + targtPosition);
+        int targetPosition =  regulatedCurrentPosition +  oneCircle/3  ;
+        moveToPosition(targetPosition);
+    }
+    public void rotateOneSlotCCW() {
+        int startPosition =  carouel.getCurrentPosition();
+        //Figure out if initial position inside which slot.
+        //Slot 1 : 0,  Slot 1:  179,  Slot 2: 538
+        int currentSlotNumber =(int) Math.round ( (float) startPosition/179 );
+        int regulatedCurrentPosition = currentSlotNumber* (oneCircle/3);
+        Log.d("9010",  " start Position: " + startPosition + "Regulated start: " + regulatedCurrentPosition);
+
+        int targetPosition =  regulatedCurrentPosition -  oneCircle/3  ;
+        moveToPosition(targetPosition);
+
+    }
+
+    private void moveToPosition(int targetPosition) {
+        PIDFController turnPidfCrtler = new PIDFController(turnKP, turnKI, turnKD, turnKF);
+        Log.d("9010", "turnKp: " + turnKP + "  lnKI: " + turnKI + " turnKD: " + turnKD);
+        turnPidfCrtler.setSetPoint(0);
+        //Set tolerance as 0.5 degrees
+        turnPidfCrtler.setTolerance(2);
+        turnPidfCrtler.setIntegrationBounds(-20, 20);
 
         while ( !turnPidfCrtler.atSetPoint()) {
-            double calculatedV = - turnPidfCrtler.calculate(targtPosition - carouel.getCurrentPosition());
+            double calculatedV = - turnPidfCrtler.calculate(targetPosition - carouel.getCurrentPosition());
             Log.d("9010","calV: " + calculatedV + " pos: " + carouel.getCurrentPosition());
             carouel.setVelocity(calculatedV);
         }
@@ -163,34 +178,6 @@ public class CarouelController {
 
     }
 
-    public void rotateOneSlotCCW() {
-        PIDFController turnPidfCrtler = new PIDFController(turnKP, turnKI, turnKD, turnKF);
-        Log.d("9010", "turnKp: " + turnKP + "  lnKI: " + turnKI + " turnKD: " + turnKD);
-        turnPidfCrtler.setSetPoint(0);
-        //Set tolerance as 0.5 degrees
-        turnPidfCrtler.setTolerance(2);
-        turnPidfCrtler.setIntegrationBounds(-20, 20);
-
-        int startPosition =  carouel.getCurrentPosition();
-        //Figure out if initial position inside which slot.
-        //Slot 1 : 0,  Slot 1:  179,  Slot 2: 538
-        int currentSlotNumber =(int) Math.round ( (float) startPosition/179 );
-        int regulatedCurrentPosition = currentSlotNumber* (oneCircle/3);
-        Log.d("9010",  " start Position: " + startPosition + "Regulated start: " + regulatedCurrentPosition);
-
-        int targtPosition =  regulatedCurrentPosition -  oneCircle/3  ;
-        Log.d("9010", "target: " + targtPosition);
-
-        while ( !turnPidfCrtler.atSetPoint()) {
-            double calculatedV = - turnPidfCrtler.calculate(targtPosition - carouel.getCurrentPosition());
-            //Log.d("9010","calV: " + calculatedV + " pos: " + carouel.getCurrentPosition());
-            carouel.setVelocity(calculatedV);
-        }
-        carouel.setVelocity(0);
-
-        Log.d("9010","Position after turn: " + carouel.getCurrentPosition());
-
-    }
 
 
 
