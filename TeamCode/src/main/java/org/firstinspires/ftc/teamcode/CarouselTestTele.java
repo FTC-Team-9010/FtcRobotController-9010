@@ -25,6 +25,8 @@ public class CarouselTestTele extends LinearOpMode {
 
             if (gamepad1.a) {
                 car.initPosition();
+            } else if ( gamepad1.b) {
+                car.rotateOneSlotCW();
             }
         }
     }

@@ -26,6 +26,10 @@ public class CarouelController {
     public RevTouchSensor meg  = null;
 
     /**
+     * Encoder counter for 360 degress.
+     */
+    private int oneCircle = 540 ;
+    /**
      * Initialize the hardware of Carouel
      */
     public void initialize() {
@@ -101,8 +105,16 @@ public class CarouelController {
     /**
      * Rotate clock wise for 120 degrees.
      */
-    private void rotateOneSlotCW() {
+    public void rotateOneSlotCW() {
 
+        int startPosition =  carouel.getCurrentPosition();
+        int targtPosition =  startPosition + oneCircle/3 ;
+        carouel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        while ( carouel.isBusy()) {
+            carouel.setPower( 0.5);
+        }
+        carouel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        carouel.setPower(0);
 
     }
 
