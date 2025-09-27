@@ -13,6 +13,8 @@ public class CarouselTestTele extends LinearOpMode {
     Hardware2026 hdw;
     CarouelController car;
 
+    double[] pidCoffs = { 7.5,0.8,0.002 };
+    int pidCoffIndex = 0;
 
 
     @Override
@@ -23,11 +25,65 @@ public class CarouselTestTele extends LinearOpMode {
 
         while (opModeIsActive()) {
 
-            if (gamepad1.a) {
+            if (gamepad1.back) {
                 car.initPosition();
             } else if ( gamepad1.b) {
+                car.setTurnKP(pidCoffs[0]);
+                car.setTurnKI(pidCoffs[1]);
+                car.setTurnKD(pidCoffs[2]);
                 car.rotateOneSlotCW();
             }
+
+            if( gamepad1.x) {
+                pidCoffIndex = 0;
+                telemetry.addLine().addData("[*Kp :]  ", pidCoffs[0]);
+                telemetry.addLine().addData("[Ki :]  ", pidCoffs[1]);
+                telemetry.addLine().addData("[Kd :]  ", pidCoffs[2]);
+                telemetry.update();
+            }
+
+            if( gamepad1.y) {
+                pidCoffIndex = 1;
+                telemetry.addLine().addData("[Kp :]  ", pidCoffs[0]);
+                telemetry.addLine().addData("[*Ki :]  ", pidCoffs[1]);
+                telemetry.addLine().addData("[Kd :]  ", pidCoffs[2]);
+                telemetry.update();
+            }
+
+            if( gamepad1.a) {
+                pidCoffIndex = 2;
+                telemetry.addLine().addData("[Kp :]  ", pidCoffs[0]);
+                telemetry.addLine().addData("[Ki :]  ", pidCoffs[1]);
+                telemetry.addLine().addData("[*Kd :]  ", pidCoffs[2]);
+                telemetry.update();
+            }
+
+            if( gamepad1.left_bumper) {
+                if (pidCoffIndex == 2 ) {
+                    pidCoffs[pidCoffIndex] -= .001;
+                } else {
+                    pidCoffs[pidCoffIndex] -= .1;
+                }
+                telemetry.addLine().addData("[Kp :]  ", pidCoffs[0]);
+                telemetry.addLine().addData("[Ki :]  ", pidCoffs[1]);
+                telemetry.addLine().addData("[Kd :]  ", pidCoffs[2]);
+                telemetry.update();
+                sleep(100);
+            }
+
+            if( gamepad1.right_bumper) {
+                if (pidCoffIndex == 2 ) {
+                    pidCoffs[pidCoffIndex] += .001;
+                } else {
+                    pidCoffs[pidCoffIndex] += .1;
+                }
+                telemetry.addLine().addData("[Kp :]  ", pidCoffs[0]);
+                telemetry.addLine().addData("[Ki :]  ", pidCoffs[1]);
+                telemetry.addLine().addData("[Kd :]  ", pidCoffs[2]);
+                telemetry.update();
+                sleep(100);
+            }
+
         }
     }
 }

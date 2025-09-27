@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.hardware;
 import android.graphics.Color;
 import android.util.Log;
 
+import com.arcrobotics.ftclib.controller.PIDFController;
 import com.qualcomm.hardware.rev.RevTouchSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -13,7 +14,14 @@ import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.hardware.SwitchableLight;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+
 public class CarouelController {
+
+    private double turnKP = 7.5;
+    private double turnKI = .8;
+    private double turnKD = 0.002;
+    private double turnKF = 0.0;
 
     HardwareMap hardwareMap;
 
@@ -25,10 +33,34 @@ public class CarouelController {
     public DcMotorEx carouel = null;
     public RevTouchSensor meg  = null;
 
+    public double getTurnKD() {
+        return turnKD;
+    }
+
+    public void setTurnKD(double turnKD) {
+        this.turnKD = turnKD;
+    }
+
+    public double getTurnKI() {
+        return turnKI;
+    }
+
+    public void setTurnKI(double turnKI) {
+        this.turnKI = turnKI;
+    }
+
+    public double getTurnKP() {
+        return turnKP;
+    }
+
+    public void setTurnKP(double turnKP) {
+        this.turnKP = turnKP;
+    }
+
     /**
      * Encoder counter for 360 degress.
      */
-    private int oneCircle = 540 ;
+    private int oneCircle = 538 ;
     /**
      * Initialize the hardware of Carouel
      */
@@ -48,7 +80,6 @@ public class CarouelController {
         // not during the loop)
         colorSensor1.setGain(gain);
 
-
         carouel = hardwareMap.get(DcMotorEx.class, "carousel");
         carouel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         carouel.setVelocity(0);
@@ -66,7 +97,6 @@ public class CarouelController {
         int currentPosition = carouel.getCurrentPosition();
         Log.d("9010:", "Carousel Current Position: " + currentPosition);
 
-
         if ( meg.isPressed()) {
             return;
         }
@@ -74,7 +104,7 @@ public class CarouelController {
         //Start spining
         carouel.setVelocity(-500);
         while (!meg.isPressed()) {
-            currentPosition = carouel.getCurrentPosition();
+            //currentPosition = carouel.getCurrentPosition();
             //Log.d("9010","Position with MagLimit" + currentPosition);
         }
         carouel.setVelocity(0);
@@ -89,11 +119,10 @@ public class CarouelController {
         carouel.setVelocity(80);
 
         while (!meg.isPressed()) {
-            currentPosition = carouel.getCurrentPosition();
-            Log.d("9010","Position with MagLimit backward" + currentPosition);
+            //currentPosition = carouel.getCurrentPosition();
+            //Log.d("9010","Position with MagLimit backward" + currentPosition);
         }
         carouel.setVelocity(0);
-
 
         Log.d("9010", "Position after stop: " + carouel.getCurrentPosition());
 
@@ -106,19 +135,60 @@ public class CarouelController {
      * Rotate clock wise for 120 degrees.
      */
     public void rotateOneSlotCW() {
+        PIDFController turnPidfCrtler = new PIDFController(turnKP, turnKI, turnKD, turnKF);
+        Log.d("9010", "turnKp: " + turnKP + "  lnKI: " + turnKI + " turnKD: " + turnKD);
+        turnPidfCrtler.setSetPoint(0);
+        //Set tolerance as 0.5 degrees
+        turnPidfCrtler.setTolerance(2);
+        turnPidfCrtler.setIntegrationBounds(-20, 20);
 
         int startPosition =  carouel.getCurrentPosition();
-        int targtPosition =  startPosition + oneCircle/3 ;
-        carouel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        while ( carouel.isBusy()) {
-            carouel.setPower( 0.5);
+        //Figure out if initial position inside which slot.
+        //Slot 1 : 0,  Slot 1:  179,  Slot 2: 538
+        int currentSlotNumber =(int) Math.round ( (float) startPosition/179 );
+        int regulatedCurrentPosition = currentSlotNumber* (oneCircle/3);
+        Log.d("9010",  " start Position: " + startPosition + "Regulated start: " + regulatedCurrentPosition);
+
+        int targtPosition =  regulatedCurrentPosition +  oneCircle/3  ;
+        Log.d("9010", "target: " + targtPosition);
+
+        while ( !turnPidfCrtler.atSetPoint()) {
+            double calculatedV = - turnPidfCrtler.calculate(targtPosition - carouel.getCurrentPosition());
+            Log.d("9010","calV: " + calculatedV + " pos: " + carouel.getCurrentPosition());
+            carouel.setVelocity(calculatedV);
         }
-        carouel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        carouel.setPower(0);
+        carouel.setVelocity(0);
+
+        Log.d("9010","Position after turn: " + carouel.getCurrentPosition());
 
     }
 
     private void rotateOneSlotCCW() {
+        PIDFController turnPidfCrtler = new PIDFController(turnKP, turnKI, turnKD, turnKF);
+        Log.d("9010", "turnKp: " + turnKP + "  lnKI: " + turnKI + " turnKD: " + turnKD);
+        turnPidfCrtler.setSetPoint(0);
+        //Set tolerance as 0.5 degrees
+        turnPidfCrtler.setTolerance(2);
+        turnPidfCrtler.setIntegrationBounds(-20, 20);
+
+        int startPosition =  carouel.getCurrentPosition();
+        //Figure out if initial position inside which slot.
+        //Slot 1 : 0,  Slot 1:  179,  Slot 2: 538
+        int currentSlotNumber =(int) Math.round ( (float) startPosition/179 );
+        int regulatedCurrentPosition = currentSlotNumber* (oneCircle/3);
+        Log.d("9010",  " start Position: " + startPosition + "Regulated start: " + regulatedCurrentPosition);
+
+        int targtPosition =  regulatedCurrentPosition -  oneCircle/3  ;
+        Log.d("9010", "target: " + targtPosition);
+
+        while ( !turnPidfCrtler.atSetPoint()) {
+            double calculatedV =  turnPidfCrtler.calculate(targtPosition - carouel.getCurrentPosition());
+            //Log.d("9010","calV: " + calculatedV + " pos: " + carouel.getCurrentPosition());
+            carouel.setVelocity(calculatedV);
+        }
+        carouel.setVelocity(0);
+
+        Log.d("9010","Position after turn: " + carouel.getCurrentPosition());
 
     }
 
