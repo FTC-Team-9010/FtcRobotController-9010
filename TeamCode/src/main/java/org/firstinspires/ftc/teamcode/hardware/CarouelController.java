@@ -31,9 +31,8 @@ public class CarouelController {
         hardwareMap = hwMap;
     }
 
-    NormalizedColorSensor colorSensor1;
-    NormalizedColorSensor colorSensor2;
-    NormalizedColorSensor colorSensor3;
+    NormalizedColorSensor[] colorSensors = new NormalizedColorSensor[3];
+
     public DcMotorEx carouel = null;
     public RevTouchSensor meg  = null;
 
@@ -74,18 +73,23 @@ public class CarouelController {
         // Get a reference to our sensor object. It's recommended to use NormalizedColorSensor over
         // ColorSensor, because NormalizedColorSensor consistently gives values between 0 and 1, while
         // the values you get from ColorSensor are dependent on the specific sensor you're using.
-        colorSensor1 = hardwareMap.get(NormalizedColorSensor.class, "color1");
+        colorSensors[0] = hardwareMap.get(NormalizedColorSensor.class, "color0");
+        colorSensors[1] = hardwareMap.get(NormalizedColorSensor.class, "color1");
+        colorSensors[2] = hardwareMap.get(NormalizedColorSensor.class, "color2");
 
 
         // If possible, turn the light on in the beginning (it might already be on anyway,
-        // we just make sure it is if we can).
-        if (colorSensor1 instanceof SwitchableLight) {
-            ((SwitchableLight) colorSensor1).enableLight(true);
+        // we just make sure it is if we can)
+        for (int i = 0; i < 3; i++) {
+            if (colorSensors[i] instanceof SwitchableLight) {
+                ((SwitchableLight) colorSensors[i]).enableLight(true);
+            }
+            float gain = 2;
+            // Tell the sensor our desired gain value (normally you would do this during initialization,
+            // not during the loop)
+            colorSensors[i].setGain(gain);
         }
-        float gain = 2;
-        // Tell the sensor our desired gain value (normally you would do this during initialization,
-        // not during the loop)
-        colorSensor1.setGain(gain);
+
 
         //Initialize the motor.
         carouel = hardwareMap.get(DcMotorEx.class, "carousel");
@@ -153,7 +157,7 @@ public class CarouelController {
         Log.d("9010",  " start Position: " + startPosition + "Regulated start: " + regulatedCurrentPosition);
 
         int targetPosition =  regulatedCurrentPosition +  oneCircle/3  ;
-        moveToPosition(targetPosition);
+        moveToPosition(targetPosition,3);
     }
     public void rotateOneSlotCCW() {
         int startPosition =  carouel.getCurrentPosition();
@@ -164,16 +168,16 @@ public class CarouelController {
         Log.d("9010",  " start Position: " + startPosition + "Regulated start: " + regulatedCurrentPosition);
 
         int targetPosition =  regulatedCurrentPosition -  oneCircle/3  ;
-        moveToPosition(targetPosition);
+        moveToPosition(targetPosition,3);
 
     }
 
-    private void moveToPosition(int targetPosition) {
+    private void moveToPosition(int targetPosition, int tolerance ) {
         PIDFController turnPidfCrtler = new PIDFController(turnKP, turnKI, turnKD, turnKF);
         Log.d("9010", "turnKp: " + turnKP + "  lnKI: " + turnKI + " turnKD: " + turnKD);
         turnPidfCrtler.setSetPoint(0);
         //Set tolerance as 0.5 degrees
-        turnPidfCrtler.setTolerance(2);
+        turnPidfCrtler.setTolerance(tolerance);
         turnPidfCrtler.setIntegrationBounds(-20, 20);
 
         while ( !turnPidfCrtler.atSetPoint()) {
@@ -191,20 +195,21 @@ public class CarouelController {
     //Get the HSV value of color sensor N
     public float getHsv1(int sensorId ) {
 
-        int moveNum = 6;
-        double distance = ((DistanceSensor) colorSensor1).getDistance(DistanceUnit.CM);
+        int currentPosition = carouel.getCurrentPosition();
+        int moveNum = 12;
+        double distance = ((DistanceSensor) colorSensors[sensorId]).getDistance(DistanceUnit.CM);
         Log.d("9010", "Distance is: " + distance);
         //If Distance is larger than 4 CM, reading of color is unreliable
         boolean moveFlag = false;
         if ( distance> 4 ) {
             //First rotate the carouel 6 ticks
-            moveToPosition(moveNum);
+            moveToPosition(moveNum + currentPosition,5);
             moveFlag = true;
         }
 
         final float[] hsvValues = new float[3];
         // Get the normalized colors from the sensor
-        NormalizedRGBA colors = colorSensor1.getNormalizedColors();
+        NormalizedRGBA colors = colorSensors[sensorId].getNormalizedColors();
 
         /* Use telemetry to display feedback on the driver station. We show the red, green, and blue
          * normalized values from the sensor (in the range of 0 to 1), as well as the equivalent
@@ -215,7 +220,7 @@ public class CarouelController {
         Color.colorToHSV(colors.toColor(), hsvValues);
         float colorValue  = hsvValues[0];
         if ( moveFlag) {
-            moveToPosition(-moveNum);
+            moveToPosition(currentPosition,3);
         }
 
         return colorValue;
