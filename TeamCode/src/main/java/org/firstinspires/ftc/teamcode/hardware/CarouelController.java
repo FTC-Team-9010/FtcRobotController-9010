@@ -32,6 +32,8 @@ public class CarouelController {
     }
 
     NormalizedColorSensor colorSensor1;
+    NormalizedColorSensor colorSensor2;
+    NormalizedColorSensor colorSensor3;
     public DcMotorEx carouel = null;
     public RevTouchSensor meg  = null;
 
@@ -59,6 +61,8 @@ public class CarouelController {
         this.turnKP = turnKP;
     }
 
+    int[] carouselIndex = new int[3];
+
     /**
      * Encoder counter for 360 degress.
      */
@@ -71,6 +75,7 @@ public class CarouelController {
         // ColorSensor, because NormalizedColorSensor consistently gives values between 0 and 1, while
         // the values you get from ColorSensor are dependent on the specific sensor you're using.
         colorSensor1 = hardwareMap.get(NormalizedColorSensor.class, "color1");
+
 
         // If possible, turn the light on in the beginning (it might already be on anyway,
         // we just make sure it is if we can).
@@ -214,6 +219,10 @@ public class CarouelController {
         }
 
         return colorValue;
+    }
+
+    public int[] getCarouselState() {
+        return carouselIndex;
     }
 
 }
