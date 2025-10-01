@@ -89,6 +89,11 @@ public class CarouselTestTele extends LinearOpMode {
                 sleep(100);
             }
 
+            if (gamepad1.dpad_up) {
+                telemetry.addLine().addData("Color:   ", car.getHsv1(1));
+                telemetry.update();
+            }
+
         }
     }
 }

@@ -8,6 +8,7 @@ import com.qualcomm.hardware.rev.RevTouchSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
@@ -15,6 +16,7 @@ import com.qualcomm.robotcore.hardware.SwitchableLight;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class CarouelController {
 
@@ -80,10 +82,12 @@ public class CarouelController {
         // not during the loop)
         colorSensor1.setGain(gain);
 
+        //Initialize the motor.
         carouel = hardwareMap.get(DcMotorEx.class, "carousel");
         carouel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         carouel.setVelocity(0);
 
+        //Init Magenetic limit switch.
         meg = hardwareMap.get(RevTouchSensor.class, "meg");
 
     }
@@ -179,19 +183,21 @@ public class CarouelController {
     }
 
 
+    //Get the HSV value of color sensor N
+    public float getHsv1(int sensorId ) {
 
+        int moveNum = 6;
+        double distance = ((DistanceSensor) colorSensor1).getDistance(DistanceUnit.CM);
+        Log.d("9010", "Distance is: " + distance);
+        //If Distance is larger than 4 CM, reading of color is unreliable
+        boolean moveFlag = false;
+        if ( distance> 4 ) {
+            //First rotate the carouel 6 ticks
+            moveToPosition(moveNum);
+            moveFlag = true;
+        }
 
-    private float getHsv() {
-
-        // Once per loop, we will update this hsvValues array. The first element (0) will contain the
-        // hue, the second element (1) will contain the saturation, and the third element (2) will
-        // contain the value. See http://web.archive.org/web/20190311170843/https://infohost.nmt.edu/tcc/help/pubs/colortheory/web/hsv.html
-        // for an explanation of HSV color.
         final float[] hsvValues = new float[3];
-
-
-        // Loop until we are asked to stop
-
         // Get the normalized colors from the sensor
         NormalizedRGBA colors = colorSensor1.getNormalizedColors();
 
@@ -202,7 +208,12 @@ public class CarouelController {
 
         // Update the hsvValues array by passing it to Color.colorToHSV()
         Color.colorToHSV(colors.toColor(), hsvValues);
-        return hsvValues[0];
+        float colorValue  = hsvValues[0];
+        if ( moveFlag) {
+            moveToPosition(-moveNum);
+        }
+
+        return colorValue;
     }
 
 }
