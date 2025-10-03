@@ -7,18 +7,32 @@ import com.arcrobotics.ftclib.controller.PIDFController;
 import com.qualcomm.hardware.rev.RevTouchSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.hardware.SwitchableLight;
-import com.qualcomm.robotcore.hardware.TouchSensor;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class CarouelController {
+    public colorOfBall[] getBallConfiguration() {
+        return ballConfiguration;
+    }
+
+    public void setBallConfiguration(colorOfBall[] ballConfiguration) {
+        this.ballConfiguration = ballConfiguration;
+    }
+
+    /**
+     * The status of ball. Either a Green, or Purple, or empty slot.
+     */
+    enum colorOfBall  { GREEN, PURPLE , EMPTY };
+
+    /**
+     * The configuration of balls on the carouel .
+     */
+    private colorOfBall[] ballConfiguration = new colorOfBall[3];
 
     private double turnKP = 7;
     private double turnKI = .8;
@@ -60,7 +74,6 @@ public class CarouelController {
         this.turnKP = turnKP;
     }
 
-    int[] carouselIndex = new int[3];
 
     /**
      * Encoder counter for 360 degress.
@@ -182,7 +195,7 @@ public class CarouelController {
 
         while ( !turnPidfCrtler.atSetPoint()) {
             double calculatedV = - turnPidfCrtler.calculate(targetPosition - carouel.getCurrentPosition());
-            Log.d("9010","calV: " + calculatedV + " pos: " + carouel.getCurrentPosition());
+            //Log.d("9010","calV: " + calculatedV + " pos: " + carouel.getCurrentPosition());
             carouel.setVelocity(calculatedV);
         }
         carouel.setVelocity(0);
@@ -192,42 +205,82 @@ public class CarouelController {
     }
 
 
-    //Get the HSV value of color sensor N
-    public float getHsv1(int sensorId ) {
+    /**
+     * Get the HSV value of color sensor N
+     * @param sensorId Id of sensor.
+     * @return the color of HSV
+     */
+    private float getHsv(int sensorId ) {
 
         int currentPosition = carouel.getCurrentPosition();
-        int moveNum = 12;
+        int moveNum = 30;
         double distance = ((DistanceSensor) colorSensors[sensorId]).getDistance(DistanceUnit.CM);
         Log.d("9010", "Distance is: " + distance);
         //If Distance is larger than 4 CM, reading of color is unreliable
         boolean moveFlag = false;
         if ( distance> 4 ) {
             //First rotate the carouel 6 ticks
-            moveToPosition(moveNum + currentPosition,5);
+            moveToPosition(moveNum + currentPosition,10);
             moveFlag = true;
         }
 
-        final float[] hsvValues = new float[3];
-        // Get the normalized colors from the sensor
-        NormalizedRGBA colors = colorSensors[sensorId].getNormalizedColors();
+        //Get distance again.
+        distance = ((DistanceSensor) colorSensors[sensorId]).getDistance(DistanceUnit.CM);
+        if ( distance> 4 ){
+            if (moveFlag) {
+                moveToPosition(currentPosition, 3);
+            }
+            return 0;
+        } else {
+            final float[] hsvValues = new float[3];
+            // Get the normalized colors from the sensor
+            NormalizedRGBA colors = colorSensors[sensorId].getNormalizedColors();
 
-        /* Use telemetry to display feedback on the driver station. We show the red, green, and blue
-         * normalized values from the sensor (in the range of 0 to 1), as well as the equivalent
-         * HSV (hue, saturation and value) values. See http://web.archive.org/web/20190311170843/https://infohost.nmt.edu/tcc/help/pubs/colortheory/web/hsv.html
-         * for an explanation of HSV color. */
+            /* Use telemetry to display feedback on the driver station. We show the red, green, and blue
+             * normalized values from the sensor (in the range of 0 to 1), as well as the equivalent
+             * HSV (hue, saturation and value) values. See http://web.archive.org/web/20190311170843/https://infohost.nmt.edu/tcc/help/pubs/colortheory/web/hsv.html
+             * for an explanation of HSV color. */
 
-        // Update the hsvValues array by passing it to Color.colorToHSV()
-        Color.colorToHSV(colors.toColor(), hsvValues);
-        float colorValue  = hsvValues[0];
-        if ( moveFlag) {
-            moveToPosition(currentPosition,3);
+            // Update the hsvValues array by passing it to Color.colorToHSV()
+            Color.colorToHSV(colors.toColor(), hsvValues);
+            float colorValue = hsvValues[0];
+            if (moveFlag) {
+                moveToPosition(currentPosition, 3);
+            }
+            return colorValue;
         }
-
-        return colorValue;
     }
 
-    public int[] getCarouselState() {
-        return carouselIndex;
+    /**
+     * Read all 3 colors into the ball configuration.
+     */
+    public void readBallConfiguration() {
+        for ( int i = 0; i < 3 ; i ++ ) {
+            float color = this.getHsv(i);
+            Log.d("9010", "Color value: " + color);
+            if ( color> 200 ) {
+                ballConfiguration[i] = colorOfBall.PURPLE;
+            } else if ( color <=200 && color > 0 ) {
+                ballConfiguration[i] = colorOfBall.GREEN;
+            } else if ( color == 0 ) {
+                ballConfiguration[i] = colorOfBall.EMPTY;
+            }
+            Log.d("9010", "Ball Configuration for sensor " + i + " : " + ballConfiguration[i]);
+        }
     }
+
+
+    public void launchGreen() {
+        if (getHsv(0) < 200) {
+            rotateOneSlotCW();
+        }
+        if (getHsv(1) < 200) {
+
+        }
+        if (getHsv(2) < 200) {
+
+        }
+    }
+
 
 }

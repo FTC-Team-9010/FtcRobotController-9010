@@ -22,6 +22,8 @@ public class Hardware2026 {
     public DcMotorEx wheelBackRight = null;
     public DcMotorEx wheelBackLeft = null;
 
+    public DcMotorEx launcher = null;
+
     //declare GoBuilda Odometry
     GoBildaPinpointDriver odo;
 
@@ -235,6 +237,14 @@ public class Hardware2026 {
 
     public void intakeOff() {
         intake.setPower(0);
+    }
+
+    public void launcherOn() {
+        launcher.setPower(1);
+    }
+
+    public void launcherOff() {
+        launcher.setPower(0);
     }
 
      */
