@@ -15,25 +15,28 @@ import com.qualcomm.robotcore.hardware.SwitchableLight;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-public class CarouelController {
-    public colorOfBall[] getBallConfiguration() {
-        return ballConfiguration;
-    }
+import java.util.Collection;
+import java.util.stream.IntStream;
 
-    public void setBallConfiguration(colorOfBall[] ballConfiguration) {
-        this.ballConfiguration = ballConfiguration;
-    }
+public class CarouelController {
 
     /**
      * The status of ball. Either a Green, or Purple, or empty slot.
      */
-    enum colorOfBall  { GREEN, PURPLE , EMPTY };
+    private final int GREEN = 10 ;
+    private final int PURPLE = 1;
+    private final int EMPTY = 0;
+
 
     /**
      * The configuration of balls on the carouel .
      */
-    private colorOfBall[] ballConfiguration = new colorOfBall[3];
+    private int [] ballConfiguration = new int [3];
 
+
+    /**
+     * PID controller parameters for carouel.
+     */
     private double turnKP = 7;
     private double turnKI = .8;
     private double turnKD = 0.002;
@@ -41,9 +44,6 @@ public class CarouelController {
 
     HardwareMap hardwareMap;
 
-    public CarouelController(HardwareMap hwMap) {
-        hardwareMap = hwMap;
-    }
 
     NormalizedColorSensor[] colorSensors = new NormalizedColorSensor[3];
 
@@ -73,12 +73,19 @@ public class CarouelController {
     public void setTurnKP(double turnKP) {
         this.turnKP = turnKP;
     }
-
+    public int [] getBallConfiguration() {
+        return ballConfiguration;
+    }
 
     /**
      * Encoder counter for 360 degress.
      */
     private int oneCircle = 538 ;
+
+
+    public CarouelController(HardwareMap hwMap) {
+        hardwareMap = hwMap;
+    }
     /**
      * Initialize the hardware of Carouel
      */
@@ -89,7 +96,6 @@ public class CarouelController {
         colorSensors[0] = hardwareMap.get(NormalizedColorSensor.class, "color0");
         colorSensors[1] = hardwareMap.get(NormalizedColorSensor.class, "color1");
         colorSensors[2] = hardwareMap.get(NormalizedColorSensor.class, "color2");
-
 
         // If possible, turn the light on in the beginning (it might already be on anyway,
         // we just make sure it is if we can)
@@ -102,7 +108,6 @@ public class CarouelController {
             // not during the loop)
             colorSensors[i].setGain(gain);
         }
-
 
         //Initialize the motor.
         carouel = hardwareMap.get(DcMotorEx.class, "carousel");
@@ -172,6 +177,10 @@ public class CarouelController {
         int targetPosition =  regulatedCurrentPosition +  oneCircle/3  ;
         moveToPosition(targetPosition,3);
     }
+
+    /**
+     * Rotate counter clock wise for 120 degrees.
+     */
     public void rotateOneSlotCCW() {
         int startPosition =  carouel.getCurrentPosition();
         //Figure out if initial position inside which slot.
@@ -185,6 +194,12 @@ public class CarouelController {
 
     }
 
+    /**
+     * Move to position by motor encoder click.
+     *
+     * @param targetPosition  Target postion
+     * @param tolerance   Torrence, larger the tolerance, less accurate.
+     */
     private void moveToPosition(int targetPosition, int tolerance ) {
         PIDFController turnPidfCrtler = new PIDFController(turnKP, turnKI, turnKD, turnKF);
         Log.d("9010", "turnKp: " + turnKP + "  lnKI: " + turnKI + " turnKD: " + turnKD);
@@ -259,28 +274,50 @@ public class CarouelController {
             float color = this.getHsv(i);
             Log.d("9010", "Color value: " + color);
             if ( color> 200 ) {
-                ballConfiguration[i] = colorOfBall.PURPLE;
+                ballConfiguration[i] =  PURPLE;
             } else if ( color <=200 && color > 0 ) {
-                ballConfiguration[i] = colorOfBall.GREEN;
+                ballConfiguration[i] = GREEN;
             } else if ( color == 0 ) {
-                ballConfiguration[i] = colorOfBall.EMPTY;
+                ballConfiguration[i] = EMPTY;
             }
             Log.d("9010", "Ball Configuration for sensor " + i + " : " + ballConfiguration[i]);
         }
     }
 
-
-    public void launchGreen() {
-        if (getHsv(0) < 200) {
-            rotateOneSlotCW();
+    /**
+     * match the ball configuration to the sequence, by rotating the carouel.
+     * @param targetGreenIndex  The index where the green ball shall be.
+     * @return  true if config can match. Other wise retrun false.
+     */
+    public boolean  matchConfigToSequence ( int targetGreenIndex ) {
+        //1.  Check if ball configration is 2 purple and 1 green.
+        int sum = IntStream.of(ballConfiguration).sum();
+        boolean ret = false;
+        Log.d("9010", "Sum is : " + sum + " targetGreenIndex: " + targetGreenIndex);
+        if ( sum !=12 ) {
+            ret =  false ;
+        } else {
+            //Find out green index in the ball config.
+            int cGreenIndex = 0;
+            for ( int i=0; i< 3 ; i++) {
+                if ( ballConfiguration[i] == GREEN ) {
+                    cGreenIndex = i;
+                }
+            }
+            //Calculate the difference between green index and target green index.
+            int diff = cGreenIndex - targetGreenIndex;
+            if ( diff == 0 ) {
+                // We already match.
+                ret =  true;
+            } else if ( diff ==-1 || diff == 2 ) {
+                rotateOneSlotCW();
+                ret =  true;
+            } else if ( diff == 1 || diff == -2 ) {
+                rotateOneSlotCCW();
+                ret =  true;
+            }
         }
-        if (getHsv(1) < 200) {
-
-        }
-        if (getHsv(2) < 200) {
-
-        }
+        return ret;
     }
-
 
 }

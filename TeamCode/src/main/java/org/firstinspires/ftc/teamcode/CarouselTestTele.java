@@ -16,11 +16,15 @@ public class CarouselTestTele extends LinearOpMode {
     double[] pidCoffs = { 7,0.8,0.002 };
     int pidCoffIndex = 0;
 
+    Hardware2026 hardware;
 
     @Override
     public void runOpMode() {
         car = new CarouelController(hardwareMap);
         car.initialize();
+        hardware = new Hardware2026(hardwareMap,telemetry);
+        hardware.createHardware();
+
         waitForStart();
 
         while (opModeIsActive()) {
@@ -90,7 +94,10 @@ public class CarouselTestTele extends LinearOpMode {
             }
 
             if (gamepad1.dpad_up) {
+                int greenIndex = hardware.readGreenIndex();
                 car.readBallConfiguration();
+                car.matchConfigToSequence( greenIndex);
+
             }
 
         }

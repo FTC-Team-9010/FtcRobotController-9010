@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
 import android.util.Log;
+import android.util.Size;
 
 import com.arcrobotics.ftclib.controller.PIDFController;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -9,11 +10,31 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+
+import java.util.List;
 
 public class Hardware2026 {
+    private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
+
+    /**
+     * The variable to store our instance of the AprilTag processor.
+     */
+    private AprilTagProcessor aprilTag;
+
+    /**
+     * The variable to store our instance of the vision portal.
+     */
+    private VisionPortal visionPortal;
+
+
     public HardwareMap hwMap;
 
     //motors
@@ -47,20 +68,72 @@ public class Hardware2026 {
     public Hardware2026(HardwareMap m, Telemetry tm) {
         hwMap = m;
         telemetry = tm;
-
     }
 
+    private void initAprilTag() {
 
+        // Create the AprilTag processor.
+        aprilTag = new AprilTagProcessor.Builder()
 
-    //public DcMotorEx intake = null;
+                //.setDrawAxes(false)
+                //.setDrawCubeProjection(false)
+                //.setDrawTagOutline(true)
+                //.setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
+                //.setTagLibrary(AprilTagGameDatabase.getCenterStageTagLibrary())
+                //.setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
 
-    //public DcMotorEx carousel = null;
+                // == CAMERA CALIBRATION ==
+                // If you do not manually specify calibration parameters, the SDK will attempt
+                // to load a predefined calibration for your camera.
+                //.setLensIntrinsics(1516.76, 1516.76, 950.833, 533.379)
 
-    //sensors
-    //public ColorSensor colorSensor = null;
+                // ... these parameters are fx, fy, cx, cy.
+
+                .build();
+
+        // Create the vision portal by using a builder.
+        VisionPortal.Builder builder = new VisionPortal.Builder()
+                .setCameraResolution(new Size(640,480));
+
+        // Set the camera (webcam vs. built-in RC phone camera).
+        if (USE_WEBCAM) {
+            builder.setCamera(hwMap.get(WebcamName.class, "Webcam 1"));
+        } else {
+            builder.setCamera(BuiltinCameraDirection.BACK);
+        }
+
+        // Choose a camera resolution. Not all cameras support all resolutions.
+        //builder.setCameraResolution(new Size(640, 480));
+
+        // Enable the RC preview (LiveView).  Set "false" to omit camera monitoring.
+        //builder.enableCameraMonitoring(true);
+
+        // Set the stream format; MJPEG uses less bandwidth than default YUY2.
+        //builder.setStreamFormat(VisionPortal.StreamFormat.YUY2);
+
+        // Choose whether or not LiveView stops if no processors are enabled.
+        // If set "true", monitor shows solid orange screen if no processors enabled.
+        // If set "false", monitor shows camera view without annotations.
+        //builder.setAutoStopLiveView(false);
+
+        // Set and enable the processor.
+        builder.addProcessor(aprilTag);
+
+        // Build the Vision Portal, using the above settings.
+        visionPortal = builder.build();
+
+        // Disable or re-enable the aprilTag processor at any time.
+        //visionPortal.setProcessorEnabled(aprilTag, true);
+
+    }   // end method initAprilTag()
+
 
 
     public void createHardware() {
+
+        initAprilTag();
+
+        /*
         wheelFrontRight = hwMap.get(DcMotorEx.class,"rfWheel");
         wheelFrontLeft = hwMap.get(DcMotorEx.class, "lfWheel");
         wheelBackRight = hwMap.get(DcMotorEx.class, "rrWheel");
@@ -76,31 +149,24 @@ public class Hardware2026 {
         wheelFrontLeft.setVelocity(0);
         wheelBackLeft.setVelocity(0);
 
-        //intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        //carousel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
         //init GoBuilda Odameter
         odo = hwMap.get(GoBildaPinpointDriver.class, "odo");
 
-        /*
-          Please refer to Go Builder Example.
-         */
         //TODO: Modidfy these offsets to match 2026 Season robot
         odo.setOffsets(85, -125);
-
+*/
         /*
         Set the kind of pods used by your robot. If you're using goBILDA odometry pods, select either
         the goBILDA_SWINGARM_POD, or the goBILDA_4_BAR_POD.
         If you're using another kind of odometry pod, uncomment setEncoderResolution and input the
         number of ticks per mm of your odometry pod.
          */
-        odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+        //odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
 
         /*
           Please refer to Go Builder Example.
          */
-        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD,
-                GoBildaPinpointDriver.EncoderDirection.FORWARD);
+        //odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD,GoBildaPinpointDriver.EncoderDirection.FORWARD);
 
         /*
         Before running the robot, recalibrate the IMU. This needs to happen when the robot is stationary
@@ -110,8 +176,27 @@ public class Hardware2026 {
         This is recommended before you run your autonomous, as a bad initial calibration can cause
         an incorrect starting value for x, y, and heading.
          */
-        odo.resetPosAndIMU();
+        //odo.resetPosAndIMU();
 
+    }
+
+    /**
+     * Read the april tag
+     * @return
+     */
+    //TODO: Modify this for use with Limelight Camera
+    public int readGreenIndex () {
+        //visionPortal.resumeStreaming();
+        int greenIndex = 0;
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+
+        // Step through the list of detections and display info for each one.
+        for (AprilTagDetection detection : currentDetections) {
+            Log.d("9010", "Detection Id: " + detection.id );
+            greenIndex = detection.id - 21;
+        }
+        //visionPortal.stopStreaming();
+        return greenIndex;
     }
 
     public void moveToXYPosition(double x, double y, double heading) throws InterruptedException {
