@@ -20,7 +20,7 @@ public class CarouselTestTele extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        car = new CarouelController(hardwareMap);
+        car = new CarouelController(hardwareMap, telemetry);
         car.initialize();
         hardware = new Hardware2026(hardwareMap,telemetry);
         hardware.createHardware();
@@ -98,6 +98,10 @@ public class CarouselTestTele extends LinearOpMode {
                 car.readBallConfiguration();
                 car.matchConfigToSequence( greenIndex);
 
+            }
+
+            if (gamepad1.dpad_down) {
+                car.shootGreen();
             }
 
         }

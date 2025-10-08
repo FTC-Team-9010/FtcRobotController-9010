@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.hardware.SwitchableLight;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import java.util.Collection;
@@ -23,15 +24,22 @@ public class CarouelController {
     /**
      * The status of ball. Either a Green, or Purple, or empty slot.
      */
-    private final int GREEN = 10 ;
+    private final int GREEN = 10;
     private final int PURPLE = 1;
     private final int EMPTY = 0;
 
+    /**
+     * Flag to show if a read of config is necessary.
+     * 1. All 3 are empty.
+     * 2. Before auto shoot
+     * 3. Manual trigger.
+     */
+    private boolean configReadNeeded ;
 
     /**
      * The configuration of balls on the carouel .
      */
-    private int [] ballConfiguration = new int [3];
+    private int[] ballConfiguration = new int[3];
 
 
     /**
@@ -48,7 +56,7 @@ public class CarouelController {
     NormalizedColorSensor[] colorSensors = new NormalizedColorSensor[3];
 
     public DcMotorEx carouel = null;
-    public RevTouchSensor meg  = null;
+    public RevTouchSensor meg = null;
 
     public double getTurnKD() {
         return turnKD;
@@ -73,19 +81,23 @@ public class CarouelController {
     public void setTurnKP(double turnKP) {
         this.turnKP = turnKP;
     }
-    public int [] getBallConfiguration() {
+
+    public int[] getBallConfiguration() {
         return ballConfiguration;
     }
 
     /**
      * Encoder counter for 360 degress.
      */
-    private int oneCircle = 538 ;
+    private int oneCircle = 538;
 
+    private Telemetry tel;
 
-    public CarouelController(HardwareMap hwMap) {
+    public CarouelController(HardwareMap hwMap , Telemetry telemetry) {
         hardwareMap = hwMap;
+        tel = telemetry;
     }
+
     /**
      * Initialize the hardware of Carouel
      */
@@ -128,7 +140,7 @@ public class CarouelController {
         int currentPosition = carouel.getCurrentPosition();
         Log.d("9010:", "Carousel Current Position: " + currentPosition);
 
-        if ( meg.isPressed()) {
+        if (meg.isPressed()) {
             return;
         }
 
@@ -167,40 +179,41 @@ public class CarouelController {
      */
     public void rotateOneSlotCW() {
 
-        int startPosition =  carouel.getCurrentPosition();
+        int startPosition = carouel.getCurrentPosition();
         //Figure out if initial position inside which slot.
         //Slot 1 : 0,  Slot 1:  179,  Slot 2: 538
-        int currentSlotNumber =(int) Math.round ( (float) startPosition/179 );
-        int regulatedCurrentPosition = currentSlotNumber* (oneCircle/3);
-        Log.d("9010",  " start Position: " + startPosition + "Regulated start: " + regulatedCurrentPosition);
+        int currentSlotNumber = (int) Math.round((float) startPosition / 179);
+        int regulatedCurrentPosition = currentSlotNumber * (oneCircle / 3);
+        Log.d("9010", " start Position: " + startPosition + "Regulated start: " + regulatedCurrentPosition);
 
-        int targetPosition =  regulatedCurrentPosition +  oneCircle/3  ;
-        moveToPosition(targetPosition,3);
+        int targetPosition = regulatedCurrentPosition + oneCircle / 3;
+        moveToPosition(targetPosition, 3);
+
     }
 
     /**
      * Rotate counter clock wise for 120 degrees.
      */
     public void rotateOneSlotCCW() {
-        int startPosition =  carouel.getCurrentPosition();
+        int startPosition = carouel.getCurrentPosition();
         //Figure out if initial position inside which slot.
         //Slot 1 : 0,  Slot 1:  179,  Slot 2: 538
-        int currentSlotNumber =(int) Math.round ( (float) startPosition/179 );
-        int regulatedCurrentPosition = currentSlotNumber* (oneCircle/3);
-        Log.d("9010",  " start Position: " + startPosition + "Regulated start: " + regulatedCurrentPosition);
+        int currentSlotNumber = (int) Math.round((float) startPosition / 179);
+        int regulatedCurrentPosition = currentSlotNumber * (oneCircle / 3);
+        Log.d("9010", " start Position: " + startPosition + "Regulated start: " + regulatedCurrentPosition);
 
-        int targetPosition =  regulatedCurrentPosition -  oneCircle/3  ;
-        moveToPosition(targetPosition,3);
+        int targetPosition = regulatedCurrentPosition - oneCircle / 3;
+        moveToPosition(targetPosition, 3);
 
     }
 
     /**
      * Move to position by motor encoder click.
      *
-     * @param targetPosition  Target postion
-     * @param tolerance   Torrence, larger the tolerance, less accurate.
+     * @param targetPosition Target postion
+     * @param tolerance      Torrence, larger the tolerance, less accurate.
      */
-    private void moveToPosition(int targetPosition, int tolerance ) {
+    private void moveToPosition(int targetPosition, int tolerance) {
         PIDFController turnPidfCrtler = new PIDFController(turnKP, turnKI, turnKD, turnKF);
         Log.d("9010", "turnKp: " + turnKP + "  lnKI: " + turnKI + " turnKD: " + turnKD);
         turnPidfCrtler.setSetPoint(0);
@@ -208,24 +221,25 @@ public class CarouelController {
         turnPidfCrtler.setTolerance(tolerance);
         turnPidfCrtler.setIntegrationBounds(-20, 20);
 
-        while ( !turnPidfCrtler.atSetPoint()) {
-            double calculatedV = - turnPidfCrtler.calculate(targetPosition - carouel.getCurrentPosition());
+        while (!turnPidfCrtler.atSetPoint()) {
+            double calculatedV = -turnPidfCrtler.calculate(targetPosition - carouel.getCurrentPosition());
             //Log.d("9010","calV: " + calculatedV + " pos: " + carouel.getCurrentPosition());
             carouel.setVelocity(calculatedV);
         }
         carouel.setVelocity(0);
 
-        Log.d("9010","Position after turn: " + carouel.getCurrentPosition());
+        Log.d("9010", "Position after turn: " + carouel.getCurrentPosition());
 
     }
 
 
     /**
      * Get the HSV value of color sensor N
+     *
      * @param sensorId Id of sensor.
      * @return the color of HSV
      */
-    private float getHsv(int sensorId ) {
+    private float getHsv(int sensorId) {
 
         int currentPosition = carouel.getCurrentPosition();
         int moveNum = 30;
@@ -233,15 +247,15 @@ public class CarouelController {
         Log.d("9010", "Distance is: " + distance);
         //If Distance is larger than 4 CM, reading of color is unreliable
         boolean moveFlag = false;
-        if ( distance> 4 ) {
+        if (distance > 4) {
             //First rotate the carouel 6 ticks
-            moveToPosition(moveNum + currentPosition,10);
+            moveToPosition(moveNum + currentPosition, 10);
             moveFlag = true;
         }
 
         //Get distance again.
         distance = ((DistanceSensor) colorSensors[sensorId]).getDistance(DistanceUnit.CM);
-        if ( distance> 4 ){
+        if (distance > 4) {
             if (moveFlag) {
                 moveToPosition(currentPosition, 3);
             }
@@ -270,54 +284,86 @@ public class CarouelController {
      * Read all 3 colors into the ball configuration.
      */
     public void readBallConfiguration() {
-        for ( int i = 0; i < 3 ; i ++ ) {
+        for (int i = 0; i < 3; i++) {
             float color = this.getHsv(i);
             Log.d("9010", "Color value: " + color);
-            if ( color> 200 ) {
-                ballConfiguration[i] =  PURPLE;
-            } else if ( color <=200 && color > 0 ) {
+            if (color > 200) {
+                ballConfiguration[i] = PURPLE;
+            } else if (color <= 200 && color > 0) {
                 ballConfiguration[i] = GREEN;
-            } else if ( color == 0 ) {
+            } else if (color == 0) {
                 ballConfiguration[i] = EMPTY;
             }
             Log.d("9010", "Ball Configuration for sensor " + i + " : " + ballConfiguration[i]);
         }
+
+        configReadNeeded = false;
     }
 
     /**
      * match the ball configuration to the sequence, by rotating the carouel.
-     * @param targetGreenIndex  The index where the green ball shall be.
-     * @return  true if config can match. Other wise retrun false.
+     *
+     * @param targetGreenIndex The index where the green ball shall be.
+     * @return true if config can match. Other wise retrun false.
      */
-    public boolean  matchConfigToSequence ( int targetGreenIndex ) {
+    public boolean matchConfigToSequence(int targetGreenIndex) {
         //1.  Check if ball configration is 2 purple and 1 green.
         int sum = IntStream.of(ballConfiguration).sum();
         boolean ret = false;
         Log.d("9010", "Sum is : " + sum + " targetGreenIndex: " + targetGreenIndex);
-        if ( sum !=12 ) {
-            ret =  false ;
+        if (sum != 12) {
+            ret = false;
         } else {
             //Find out green index in the ball config.
             int cGreenIndex = 0;
-            for ( int i=0; i< 3 ; i++) {
-                if ( ballConfiguration[i] == GREEN ) {
+            for (int i = 0; i < 3; i++) {
+                if (ballConfiguration[i] == GREEN) {
                     cGreenIndex = i;
                 }
             }
             //Calculate the difference between green index and target green index.
             int diff = cGreenIndex - targetGreenIndex;
-            if ( diff == 0 ) {
+            if (diff == 0) {
                 // We already match.
-                ret =  true;
-            } else if ( diff ==-1 || diff == 2 ) {
-                rotateOneSlotCW();
-                ret =  true;
-            } else if ( diff == 1 || diff == -2 ) {
+                ret = true;
+            } else if (diff == -1 || diff == 2) {
                 rotateOneSlotCCW();
-                ret =  true;
+                ret = true;
+            } else if (diff == 1 || diff == -2) {
+                rotateOneSlotCW();
+                ret = true;
             }
         }
         return ret;
+    }
+
+    public void shootBall() {
+        Log.d("9010", "Shoot Ball");
+        //After shoot ball, position 0 becomes empty
+        ballConfiguration[0]=EMPTY;
+    }
+
+    public void shootGreen() {
+        readBallConfiguration();
+        int carGreenIndex = -1;
+        for (int i = 0; i < 3; i++) {
+            if (ballConfiguration[i] == GREEN) {
+                carGreenIndex = i;
+            }
+        }
+
+        if (carGreenIndex == 0) {
+            // We already match.
+            Log.d("9010", "match");
+        } else if (carGreenIndex == 2) {
+            rotateOneSlotCW();
+        } else if (carGreenIndex == 1) {
+            rotateOneSlotCCW();
+        }
+        Log.d("9010", "match after rotate");
+        //hi dad :>
+        shootBall();
+
     }
 
 }
