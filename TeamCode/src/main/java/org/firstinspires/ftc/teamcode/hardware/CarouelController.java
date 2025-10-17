@@ -52,7 +52,6 @@ public class CarouelController {
 
     HardwareMap hardwareMap;
 
-
     NormalizedColorSensor[] colorSensors = new NormalizedColorSensor[3];
 
     public DcMotorEx carouel = null;
@@ -188,6 +187,10 @@ public class CarouelController {
 
         int targetPosition = regulatedCurrentPosition + oneCircle / 3;
         moveToPosition(targetPosition, 3);
+        int temp = ballConfiguration[0];
+        ballConfiguration[0] = ballConfiguration[1];
+        ballConfiguration[1] = ballConfiguration[2];
+        ballConfiguration[2] = temp;
 
     }
 
@@ -200,11 +203,15 @@ public class CarouelController {
         //Slot 1 : 0,  Slot 1:  179,  Slot 2: 538
         int currentSlotNumber = (int) Math.round((float) startPosition / 179);
         int regulatedCurrentPosition = currentSlotNumber * (oneCircle / 3);
-        Log.d("9010", " start Position: " + startPosition + "Regulated start: " + regulatedCurrentPosition);
+        //Log.d("9010", " start Position: " + startPosition + "Regulated start: " + regulatedCurrentPosition);
 
         int targetPosition = regulatedCurrentPosition - oneCircle / 3;
         moveToPosition(targetPosition, 3);
 
+        int temp = ballConfiguration[0];
+        ballConfiguration[0] = ballConfiguration[2];
+        ballConfiguration[2] = ballConfiguration[1];
+        ballConfiguration[1] = temp;
     }
 
     /**
@@ -215,7 +222,7 @@ public class CarouelController {
      */
     private void moveToPosition(int targetPosition, int tolerance) {
         PIDFController turnPidfCrtler = new PIDFController(turnKP, turnKI, turnKD, turnKF);
-        Log.d("9010", "turnKp: " + turnKP + "  lnKI: " + turnKI + " turnKD: " + turnKD);
+        //Log.d("9010", "turnKp: " + turnKP + "  lnKI: " + turnKI + " turnKD: " + turnKD);
         turnPidfCrtler.setSetPoint(0);
         //Set tolerance as 0.5 degrees
         turnPidfCrtler.setTolerance(tolerance);
@@ -228,7 +235,7 @@ public class CarouelController {
         }
         carouel.setVelocity(0);
 
-        Log.d("9010", "Position after turn: " + carouel.getCurrentPosition());
+        //Log.d("9010", "Position after turn: " + carouel.getCurrentPosition());
 
     }
 
@@ -321,30 +328,55 @@ public class CarouelController {
                     cGreenIndex = i;
                 }
             }
+            Log.d("9010","Found green in : " + cGreenIndex);
             //Calculate the difference between green index and target green index.
             int diff = cGreenIndex - targetGreenIndex;
             if (diff == 0) {
                 // We already match.
                 ret = true;
             } else if (diff == -1 || diff == 2) {
-                rotateOneSlotCCW();
+                rotateOneSlotCW();
                 ret = true;
             } else if (diff == 1 || diff == -2) {
-                rotateOneSlotCW();
+                rotateOneSlotCCW();
                 ret = true;
             }
         }
         return ret;
     }
 
+
+    /**
+     * Shoot the ball in the pattern. Before this calling this method, call matchConficToSequence first
+     */
+    public void shootPattern(int decodedGreenIndex) {
+        readBallConfiguration();
+        if (matchConfigToSequence(decodedGreenIndex)) {
+            Log.d("9010", ballConfiguration[0] + " " + ballConfiguration[1] + " " + ballConfiguration[2]);
+            shootBall();
+            Log.d("9010", "after first shoot " + ballConfiguration[0] + " " + ballConfiguration[1] + " " + ballConfiguration[2]);
+            for (int i = 1; i < 3; i++) {
+                rotateOneSlotCW();
+                shootBall();
+                Log.d("9010", " loop shoot " + ballConfiguration[0] + " " + ballConfiguration[1] + " " + ballConfiguration[2]);
+            }
+
+        }
+
+
+    }
     public void shootBall() {
         Log.d("9010", "Shoot Ball");
         //After shoot ball, position 0 becomes empty
         ballConfiguration[0]=EMPTY;
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void shootGreen() {
-        readBallConfiguration();
         int carGreenIndex = -1;
         for (int i = 0; i < 3; i++) {
             if (ballConfiguration[i] == GREEN) {
@@ -362,6 +394,27 @@ public class CarouelController {
         }
         Log.d("9010", "match after rotate");
         //hi dad :>
+        shootBall();
+        Log.d("9010", ballConfiguration[0] + " " + ballConfiguration[1] + " " + ballConfiguration[2]);
+
+    }
+
+    public void shootPurple() {
+        int carPurpleIndex = -1;
+        for (int i = 0; i < 3; i++) {
+            if (ballConfiguration[i] == PURPLE) {
+                carPurpleIndex = -1;
+
+            }
+        }
+        if (carPurpleIndex == 0) {
+            // We already match.
+            Log.d("9010", "match");
+        } else if (carPurpleIndex == 2 ) {
+            rotateOneSlotCW();
+        } else if (carPurpleIndex == 1) {
+            rotateOneSlotCCW();
+        }
         shootBall();
 
     }
