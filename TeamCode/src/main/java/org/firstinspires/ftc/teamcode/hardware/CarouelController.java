@@ -15,10 +15,20 @@ import com.qualcomm.robotcore.hardware.SwitchableLight;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.opencv.ml.EM;
 
 import java.util.Collection;
 import java.util.stream.IntStream;
 
+/**
+ * This class controls Carouel.
+ * Carouel has a meg detector, to initialize the position of the carousel.
+ * After this step. following movement is by motor encoder.   360  is about 538 encoder tick.
+ *
+ * There are 3 color sensor on carouel.  Position 0 is where launcher is.  Counting clockwise, is
+ * Position 1 and position 2.
+ *
+ */
 public class CarouelController {
 
     /**
@@ -31,16 +41,15 @@ public class CarouelController {
     /**
      * Flag to show if a read of config is necessary.
      * 1. All 3 are empty.
-     * 2. Before auto shoot
-     * 3. Manual trigger.
+     * 2. Manual trigger.
      */
-    private boolean configReadNeeded ;
+    private boolean configReadNeeded =true;
 
     /**
      * The configuration of balls on the carouel .
+     * 0 - Luncher.  Clockwise position 1 and 2.
      */
     private int[] ballConfiguration = new int[3];
-
 
     /**
      * PID controller parameters for carouel.
@@ -188,10 +197,13 @@ public class CarouelController {
         int targetPosition = regulatedCurrentPosition + oneCircle / 3;
         moveToPosition(targetPosition, 3);
         int temp = ballConfiguration[0];
-        ballConfiguration[0] = ballConfiguration[1];
-        ballConfiguration[1] = ballConfiguration[2];
-        ballConfiguration[2] = temp;
+        ballConfiguration[0] = ballConfiguration[2];
+        ballConfiguration[2] = ballConfiguration[1];
+        ballConfiguration[1] = temp;
 
+        tel.addData("Ball Config: [" , ballConfiguration[0] + "] [" +
+                ballConfiguration[1] + "] ["+ ballConfiguration[2]+"]");
+        tel.update();
     }
 
     /**
@@ -209,9 +221,13 @@ public class CarouelController {
         moveToPosition(targetPosition, 3);
 
         int temp = ballConfiguration[0];
-        ballConfiguration[0] = ballConfiguration[2];
-        ballConfiguration[2] = ballConfiguration[1];
-        ballConfiguration[1] = temp;
+        ballConfiguration[0] = ballConfiguration[1];
+        ballConfiguration[1] = ballConfiguration[2];
+        ballConfiguration[2] = temp;
+
+        tel.addData("Ball Config: [" , ballConfiguration[0] + "] [" +
+                ballConfiguration[1] + "] ["+ ballConfiguration[2]+"]");
+        tel.update();
     }
 
     /**
@@ -234,9 +250,7 @@ public class CarouelController {
             carouel.setVelocity(calculatedV);
         }
         carouel.setVelocity(0);
-
         //Log.d("9010", "Position after turn: " + carouel.getCurrentPosition());
-
     }
 
 
@@ -289,6 +303,7 @@ public class CarouelController {
 
     /**
      * Read all 3 colors into the ball configuration.
+     * after reading, set confReadNeeded flag to false;
      */
     public void readBallConfiguration() {
         for (int i = 0; i < 3; i++) {
@@ -301,14 +316,17 @@ public class CarouelController {
             } else if (color == 0) {
                 ballConfiguration[i] = EMPTY;
             }
-            Log.d("9010", "Ball Configuration for sensor " + i + " : " + ballConfiguration[i]);
+            tel.addData("Ball Config: [" , ballConfiguration[0] + "] [" +
+                    ballConfiguration[1] + "] ["+ ballConfiguration[2]+"]");
+            tel.update();
         }
-
         configReadNeeded = false;
     }
 
     /**
      * match the ball configuration to the sequence, by rotating the carouel.
+     * After matching, the sequence of ball in position 0 , 1, 2  shall match
+     * the sequence given where the green ball shall be at.
      *
      * @param targetGreenIndex The index where the green ball shall be.
      * @return true if config can match. Other wise retrun false.
@@ -347,28 +365,45 @@ public class CarouelController {
 
 
     /**
-     * Shoot the ball in the pattern. Before this calling this method, call matchConficToSequence first
+     * Shoot the ball in the pattern.
+     * This method will call read Ball COnfiguration, and then match configToSequence.
+     * THen,  lunch Ball in detected sequence.
      */
     public void shootPattern(int decodedGreenIndex) {
-        readBallConfiguration();
+        if ( configReadNeeded ) {
+            readBallConfiguration();
+        }
         if (matchConfigToSequence(decodedGreenIndex)) {
             Log.d("9010", ballConfiguration[0] + " " + ballConfiguration[1] + " " + ballConfiguration[2]);
             shootBall();
-            Log.d("9010", "after first shoot " + ballConfiguration[0] + " " + ballConfiguration[1] + " " + ballConfiguration[2]);
+            Log.d("9010", "after first shoot " );
             for (int i = 1; i < 3; i++) {
-                rotateOneSlotCW();
+                rotateOneSlotCCW();
                 shootBall();
-                Log.d("9010", " loop shoot " + ballConfiguration[0] + " " + ballConfiguration[1] + " " + ballConfiguration[2]);
+                //Log.d("9010", " loop shoot " + ballConfiguration[0] + " " + ballConfiguration[1] + " " + ballConfiguration[2]);
             }
-
         }
 
-
     }
+
+    /**
+     * This method shoot the ball in position 0 .
+     * After shooting, set ball position 0 to empty.
+     */
     public void shootBall() {
-        Log.d("9010", "Shoot Ball");
         //After shoot ball, position 0 becomes empty
         ballConfiguration[0]=EMPTY;
+        Log.d("9010", "After shoot ball, ball config: "
+                + ballConfiguration[0] + " " + ballConfiguration[1] + " " + ballConfiguration[2]);
+        if ( ballConfiguration[1]==EMPTY  && ballConfiguration[2]==EMPTY ) {
+            //All 3 empty, set read flag.
+            configReadNeeded = true;
+        }
+        tel.addData("Ball Config: [" , ballConfiguration[0] + "] [" +
+                ballConfiguration[1] + "] ["+ ballConfiguration[2]+"]");
+        tel.addData("read needed:" , configReadNeeded);
+        tel.update();
+
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
@@ -377,46 +412,57 @@ public class CarouelController {
     }
 
     public void shootGreen() {
+        if (configReadNeeded) {
+            readBallConfiguration();
+        }
         int carGreenIndex = -1;
         for (int i = 0; i < 3; i++) {
             if (ballConfiguration[i] == GREEN) {
                 carGreenIndex = i;
             }
         }
+        //If not found green, return
+        if (carGreenIndex==-1) {
+            Log.d("9010","Did not found Green ball");
+            return;
+        }
 
         if (carGreenIndex == 0) {
             // We already match.
-            Log.d("9010", "match");
+            //Log.d("9010", "match");
         } else if (carGreenIndex == 2) {
             rotateOneSlotCW();
         } else if (carGreenIndex == 1) {
             rotateOneSlotCCW();
         }
-        Log.d("9010", "match after rotate");
-        //hi dad :>
         shootBall();
-        Log.d("9010", ballConfiguration[0] + " " + ballConfiguration[1] + " " + ballConfiguration[2]);
-
+        //Log.d("9010", ballConfiguration[0] + " " + ballConfiguration[1] + " " + ballConfiguration[2]);
     }
 
     public void shootPurple() {
+        if (configReadNeeded) {
+            readBallConfiguration();
+        }
         int carPurpleIndex = -1;
         for (int i = 0; i < 3; i++) {
             if (ballConfiguration[i] == PURPLE) {
-                carPurpleIndex = -1;
-
+                carPurpleIndex = i;
             }
         }
+        //If not found green, return
+        if (carPurpleIndex==-1) {
+            Log.d("9010","DId not found Purple ball ");
+            return;
+        }
+
         if (carPurpleIndex == 0) {
             // We already match.
-            Log.d("9010", "match");
+            //Log.d("9010", "match");
         } else if (carPurpleIndex == 2 ) {
             rotateOneSlotCW();
         } else if (carPurpleIndex == 1) {
             rotateOneSlotCCW();
         }
         shootBall();
-
     }
-
 }
