@@ -111,7 +111,10 @@ public class CarouselTestTele extends LinearOpMode {
 
             if (gamepad1.right_stick_button) {
                 car.shootGreen();
+            }
 
+            if (gamepad1.start) {
+                car.readBallConfiguration();
             }
 
         }

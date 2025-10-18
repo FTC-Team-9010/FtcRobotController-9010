@@ -320,7 +320,11 @@ public class CarouelController {
                     ballConfiguration[1] + "] ["+ ballConfiguration[2]+"]");
             tel.update();
         }
-        configReadNeeded = false;
+        if (ballConfiguration[0] + ballConfiguration[1]+ ballConfiguration[2] ==0 ){
+            configReadNeeded = true;
+        } else {
+            configReadNeeded = false;
+        }
     }
 
     /**
