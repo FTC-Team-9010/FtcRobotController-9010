@@ -199,6 +199,71 @@ public class Hardware2026 {
         return greenIndex;
     }
 
+
+
+    /**
+     * Move Robot according to the position of the April Tag.  Robot suppose to be square with the
+     * april tag
+     *
+     * @param tagId    Id of the tag to be used for reference.
+     * @param targetY   distance of robot to the april tag,  unit in inches.
+     * @param targetX   horizontal shift to the center of april tag.  unit in inches.  Positive
+     *                  means tag is on the right of robot camera.
+     */
+    public void moveByAprilTag( int tagId,  double targetY  ,  double targetX  ) throws InterruptedException {
+        //TODO: Recauculate this.
+        //Yaw difference between camera and robot front line.
+        double yawOffset = 0;
+        //Center of robot to the camera,
+        double cameraRadius = 6.875 ;
+
+        Log.d("9010", "in MoveByApril Tag, Target Tag is: "  + tagId );
+
+        //Start April Tag detection fo find tag, possible multiple tag in camera frame,
+        //So result is a list.
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+        if (currentDetections.size()<1 ) {
+            //No tag found, do nothing.
+            telemetry.addData("No AprilTags Detected, exit ", currentDetections.size());
+            telemetry.update();
+            Log.d("9010", "No AprilTags Detected, Exit "  + tagId );
+            //visionPortal.setProcessorEnabled(aprilTagProc,false);
+            return;
+        } else {
+            //Loop though tags found
+            for ( AprilTagDetection detection : currentDetections) {
+                if ( detection.id == tagId) {
+                    //Here we found our target April Tag.
+                    //Get Initial Error
+                    double xToTag = detection.ftcPose.x ;
+                    Log.d("9010", "xToTag: " + xToTag) ;
+                    double yToTag = detection.ftcPose.y ;
+                    Log.d("9010", "xToTag: " + yToTag) ;
+                    double yawToTag  = detection.ftcPose.yaw;
+                    Log.d("9010", " Yaw " + yawToTag);
+                    double rangeToTag = detection.ftcPose.range;
+                    double bearingToTag = detection.ftcPose.bearing;
+
+                    double newX= rangeToTag * Math.sin( Math.toRadians( bearingToTag - yawToTag)  );
+                    double newY = rangeToTag * Math.sin(Math.toRadians(bearingToTag - yawToTag));
+
+                    //Recalc for the Y and X shift, after the turn
+                    this.moveToXYPosition(newX - targetX , newY - targetY, yawToTag-yawOffset);
+
+                } // if ( detection.id == tagId) {
+            } // for ( AprilTagDetection detectio  n : currentDetections) {
+        }
+
+    }
+
+
+    /**
+     * This operation moves robot to a position relative to its current position
+     *
+     * @param x       Target x position,  unit in mm   Positive to forward, negative to backward.
+     * @param y       Target y position,  unix in mm,  Positive to left, negative to right.
+     * @param heading Target heading, in degress,  Positive to turn left, negative to turn right.
+     */
     public void moveToXYPosition(double x, double y, double heading) throws InterruptedException {
         Log.d("9010", "Entering into moveToXYPosition ");
 
