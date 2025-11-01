@@ -128,7 +128,6 @@ public class Hardware2026 {
     }   // end method initAprilTag()
 
 
-
     public void createHardware() {
 
         initAprilTag();
