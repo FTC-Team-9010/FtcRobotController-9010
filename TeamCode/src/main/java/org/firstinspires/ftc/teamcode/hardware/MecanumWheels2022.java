@@ -7,7 +7,9 @@ import com.qualcomm.robotcore.hardware.Gamepad;
  * This fits for the wheel configuration of :
  *   The wheels need to form an "X" configuration
  */
-public class MecanumWheels2022 {
+public class MecanumWheels2022 {a
+
+
 
     //Initialize wheel motor power to 0
     public double wheelFrontRightPower = 0;
