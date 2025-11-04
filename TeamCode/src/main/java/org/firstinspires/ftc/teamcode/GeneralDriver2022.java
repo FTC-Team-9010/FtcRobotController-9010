@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.hardware.Hardware2022;
 import org.firstinspires.ftc.teamcode.hardware.MecanumWheels2022;
 
-@TeleOp(name="GeneralDriver2022", group="TeleOps")
+//@TeleOp(name="GeneralDriver2022", group="TeleOps")
 public class GeneralDriver2022 extends LinearOpMode {
 
     private boolean debug = true;

@@ -7,8 +7,7 @@ import org.firstinspires.ftc.teamcode.hardware.Hardware2022;
 import org.firstinspires.ftc.teamcode.hardware.Hardware2024Fred;
 import org.firstinspires.ftc.teamcode.hardware.MecanumWheels2023;
 
-@TeleOp(name="GeneralDriverFred2024", group="TeleOps")
-
+//@TeleOp(name="GeneralDriverFred2024", group="TeleOps")
 public class GeneralDriverFred2024 extends LinearOpMode {
 
     private boolean debug = true;

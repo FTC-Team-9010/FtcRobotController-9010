@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.teamcode.hardware.Hardware2025Tifini;
 import org.firstinspires.ftc.teamcode.hardware.MecanumWheels2023;
 
-@TeleOp(name="GeneralDriverTifini2025", group="TeleOps")
+//@TeleOp(name="GeneralDriverTifini2025", group="TeleOps")
 public class GeneralDriver2025Tifini extends LinearOpMode {
 
     private boolean debug = true;

@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import android.util.Log;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous(name = "RightAuto")
+//@Autonomous(name = "RightAuto")
 public class RightAuto extends BaseAuto {
 
     @Override

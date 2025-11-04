@@ -4,6 +4,9 @@ import android.util.Log;
 import android.util.Size;
 
 import com.arcrobotics.ftclib.controller.PIDFController;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -15,25 +18,13 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
-import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 
 import java.util.List;
 
 public class Hardware2026 {
-    private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
 
-    /**
-     * The variable to store our instance of the AprilTag processor.
-     */
-    private AprilTagProcessor aprilTag;
-
-    /**
-     * The variable to store our instance of the vision portal.
-     */
-    private VisionPortal visionPortal;
-
+    private Limelight3A limelight;
 
     public HardwareMap hwMap;
 
@@ -70,67 +61,12 @@ public class Hardware2026 {
         telemetry = tm;
     }
 
-    private void initAprilTag() {
-
-        // Create the AprilTag processor.
-        aprilTag = new AprilTagProcessor.Builder()
-
-                //.setDrawAxes(false)
-                //.setDrawCubeProjection(false)
-                //.setDrawTagOutline(true)
-                //.setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
-                //.setTagLibrary(AprilTagGameDatabase.getCenterStageTagLibrary())
-                //.setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
-
-                // == CAMERA CALIBRATION ==
-                // If you do not manually specify calibration parameters, the SDK will attempt
-                // to load a predefined calibration for your camera.
-                //.setLensIntrinsics(1516.76, 1516.76, 950.833, 533.379)
-
-                // ... these parameters are fx, fy, cx, cy.
-
-                .build();
-
-        // Create the vision portal by using a builder.
-        VisionPortal.Builder builder = new VisionPortal.Builder()
-                .setCameraResolution(new Size(640,480));
-
-        // Set the camera (webcam vs. built-in RC phone camera).
-        if (USE_WEBCAM) {
-            builder.setCamera(hwMap.get(WebcamName.class, "Webcam 1"));
-        } else {
-            builder.setCamera(BuiltinCameraDirection.BACK);
-        }
-
-        // Choose a camera resolution. Not all cameras support all resolutions.
-        //builder.setCameraResolution(new Size(640, 480));
-
-        // Enable the RC preview (LiveView).  Set "false" to omit camera monitoring.
-        //builder.enableCameraMonitoring(true);
-
-        // Set the stream format; MJPEG uses less bandwidth than default YUY2.
-        //builder.setStreamFormat(VisionPortal.StreamFormat.YUY2);
-
-        // Choose whether or not LiveView stops if no processors are enabled.
-        // If set "true", monitor shows solid orange screen if no processors enabled.
-        // If set "false", monitor shows camera view without annotations.
-        //builder.setAutoStopLiveView(false);
-
-        // Set and enable the processor.
-        builder.addProcessor(aprilTag);
-
-        // Build the Vision Portal, using the above settings.
-        visionPortal = builder.build();
-
-        // Disable or re-enable the aprilTag processor at any time.
-        //visionPortal.setProcessorEnabled(aprilTag, true);
-
-    }   // end method initAprilTag()
-
 
     public void createHardware() {
-
-        initAprilTag();
+        //Initialize LimeLite
+        limelight = hwMap.get(Limelight3A.class, "limelight");
+        limelight.pipelineSwitch(0);
+        limelight.start();
 
         /*
         wheelFrontRight = hwMap.get(DcMotorEx.class,"rfWheel");
@@ -181,23 +117,24 @@ public class Hardware2026 {
 
     /**
      * Read the april tag
-     * @return
+     *
+     * @return  return the index, 1 2 or 3.
+     * If failed to read, it'll return 0.  In auto,  it shall loop till a timeout to find a valid
+     * reading.
      */
-    //TODO: Modify this for use with Limelight Camera
     public int readGreenIndex () {
-        //visionPortal.resumeStreaming();
-        int greenIndex = 0;
-        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
 
-        // Step through the list of detections and display info for each one.
-        for (AprilTagDetection detection : currentDetections) {
-            Log.d("9010", "Detection Id: " + detection.id );
-            greenIndex = detection.id - 21;
+        int greenIndex = 0;
+        LLResult result = limelight.getLatestResult();
+        if (result.isValid()) {
+            // Access fiducial results
+            List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
+            for (LLResultTypes.FiducialResult fr : fiducialResults) {
+                greenIndex = fr.getFiducialId() - 20;
+            }
         }
-        //visionPortal.stopStreaming();
         return greenIndex;
     }
-
 
 
     /**
@@ -220,39 +157,35 @@ public class Hardware2026 {
 
         //Start April Tag detection fo find tag, possible multiple tag in camera frame,
         //So result is a list.
-        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
-        if (currentDetections.size()<1 ) {
-            //No tag found, do nothing.
-            telemetry.addData("No AprilTags Detected, exit ", currentDetections.size());
+        LLResult result = limelight.getLatestResult();
+        if (result.isValid()) {
+            // Access fiducial results
+            List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
+            for (LLResultTypes.FiducialResult fr : fiducialResults) {
+                    if ( fr.getFiducialId() == tagId) {
+                        //Here we found our target April Tag.
+                        //Get Initial Error
+                        double xToTag = fr.getTargetPoseCameraSpace().getPosition().x*1000;
+                        Log.d("9010", "xToTag: " + xToTag) ;
+
+                        double yawToTag  = fr.getTargetPoseCameraSpace().getOrientation().getYaw();
+                        Log.d("9010", " Yaw " + yawToTag);
+                        double rangeToTag = fr.getTargetPoseCameraSpace().getPosition().z*1000;
+
+                        double newX= rangeToTag * Math.sin( Math.toRadians( - yawToTag)  );
+                        double newY = rangeToTag * Math.sin(Math.toRadians( - yawToTag));
+
+                        //Recalc for the Y and X shift, after the turn
+                        this.moveToXYPosition(newX - targetX , newY - targetY, yawToTag-yawOffset);
+
+                    }
+                }
+
+        } else {
+            telemetry.addData("No AprilTags Detected, exit ", tagId );
             telemetry.update();
             Log.d("9010", "No AprilTags Detected, Exit "  + tagId );
-            //visionPortal.setProcessorEnabled(aprilTagProc,false);
-            return;
-        } else {
-            //Loop though tags found
-            for ( AprilTagDetection detection : currentDetections) {
-                if ( detection.id == tagId) {
-                    //Here we found our target April Tag.
-                    //Get Initial Error
-                    double xToTag = detection.ftcPose.x ;
-                    Log.d("9010", "xToTag: " + xToTag) ;
-                    double yToTag = detection.ftcPose.y ;
-                    Log.d("9010", "xToTag: " + yToTag) ;
-                    double yawToTag  = detection.ftcPose.yaw;
-                    Log.d("9010", " Yaw " + yawToTag);
-                    double rangeToTag = detection.ftcPose.range;
-                    double bearingToTag = detection.ftcPose.bearing;
-
-                    double newX= rangeToTag * Math.sin( Math.toRadians( bearingToTag - yawToTag)  );
-                    double newY = rangeToTag * Math.sin(Math.toRadians(bearingToTag - yawToTag));
-
-                    //Recalc for the Y and X shift, after the turn
-                    this.moveToXYPosition(newX - targetX , newY - targetY, yawToTag-yawOffset);
-
-                } // if ( detection.id == tagId) {
-            } // for ( AprilTagDetection detectio  n : currentDetections) {
         }
-
     }
 
 

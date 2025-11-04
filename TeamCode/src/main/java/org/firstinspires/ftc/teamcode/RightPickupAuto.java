@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import android.util.Log;
-@Autonomous(name = "RightPickup_Auto")
+//@Autonomous(name = "RightPickup_Auto")
 public class RightPickupAuto extends BaseAuto {
 
     @Override

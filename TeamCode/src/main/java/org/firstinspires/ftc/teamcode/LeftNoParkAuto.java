@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous(name = "LeftNoPark")
+//@Autonomous(name = "LeftNoPark")
 public class LeftNoParkAuto extends BaseAuto{
     @Override
     void moveBeforeSpecimen() {

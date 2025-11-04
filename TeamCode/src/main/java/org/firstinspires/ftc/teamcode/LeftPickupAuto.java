@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import android.util.Log;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous(name = "LeftPickup_Auto")
+//@Autonomous(name = "LeftPickup_Auto")
 public class LeftPickupAuto extends BaseAuto {
     @Override
     void moveBeforeSpecimen() {
