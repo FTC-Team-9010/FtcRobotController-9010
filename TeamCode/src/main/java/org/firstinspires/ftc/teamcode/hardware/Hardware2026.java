@@ -79,6 +79,11 @@ public class Hardware2026 {
         wheelFrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         wheelBackRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        wheelFrontLeft.setDirection(DcMotor.Direction.FORWARD);
+        wheelBackLeft.setDirection(DcMotor.Direction.FORWARD);
+        wheelFrontRight.setDirection(DcMotor.Direction.REVERSE);
+        wheelBackRight.setDirection(DcMotor.Direction.REVERSE);
+
         wheelFrontRight.setVelocity(0);
         wheelBackRight.setVelocity(0);
         wheelFrontLeft.setVelocity(0);
@@ -165,17 +170,17 @@ public class Hardware2026 {
                     if ( fr.getFiducialId() == tagId) {
                         //Here we found our target April Tag.
                         //Get Initial Error
-                        double xToTag = fr.getTargetPoseCameraSpace().getPosition().x*1000;
-                        Log.d("9010", "xToTag: " + xToTag) ;
+                        //double xToTag = fr.getTargetPoseCameraSpace().getPosition().x*1000;
+                        //Log.d("9010", "xToTag: " + xToTag) ;
 
                         double yawToTag  = fr.getTargetPoseCameraSpace().getOrientation().getYaw();
-                        Log.d("9010", " Yaw " + yawToTag);
                         double rangeToTag = fr.getTargetPoseCameraSpace().getPosition().z*1000;
+                        Log.d("9010", " Yaw " + yawToTag + "range: " + rangeToTag);
 
                         double newX= rangeToTag * Math.sin( Math.toRadians( - yawToTag)  );
-                        double newY = rangeToTag * Math.sin(Math.toRadians( - yawToTag));
+                        double newY = rangeToTag * Math.cos(Math.toRadians( - yawToTag));
 
-                        //Recalc for the Y and X shift, after the turn
+                        //Move by odometer.
                         this.moveToXYPosition(newX - targetX , newY - targetY, yawToTag-yawOffset);
 
                     }
