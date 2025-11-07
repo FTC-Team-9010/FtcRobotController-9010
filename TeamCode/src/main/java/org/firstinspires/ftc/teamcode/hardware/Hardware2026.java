@@ -36,13 +36,9 @@ public class Hardware2026 {
     public DcMotorEx wheelBackRight = null;
     public DcMotorEx wheelBackLeft = null;
 
-    private DcMotor launcher = null;
-    private float launcherPower = 0;
     private DcMotor intake = null;
     private float intakePower = 0 ;
-
-    private Servo lanchLever = null;
-    private final float leverLowPosition =(float) 0.3;
+    public final float INTAKE_POWER  = (float) 1;
 
 
     //declare GoBuilda Odometry
@@ -74,10 +70,6 @@ public class Hardware2026 {
         return intakePower;
     }
 
-    public float getLauncherPower() {
-        return launcherPower;
-    }
-
     public void createHardware() {
         //Initialize LimeLite
         limelight = hwMap.get(Limelight3A.class, "limelight");
@@ -104,16 +96,11 @@ public class Hardware2026 {
         wheelFrontLeft.setVelocity(0);
         wheelBackLeft.setVelocity(0);
 
-        launcher = hwMap.get(DcMotorEx.class,"launcher");
-        launcher.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        launcher.setDirection(DcMotorSimple.Direction.REVERSE);
 
         intake = hwMap.get(DcMotorEx.class,"intake");
         intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         intake.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        lanchLever = hwMap.get(Servo.class,"launchLever");
-        lanchLever.setPosition(leverLowPosition);
 
         //init GoBuilda Odameter
         odo = hwMap.get(GoBildaPinpointDriver.class, "odo");
@@ -349,17 +336,5 @@ public class Hardware2026 {
         intake.setPower(power );
     }
 
-    public void setLauncherPower (float power ) {
-        launcherPower=power;
-        launcher.setPower(power);
-    }
-
-    public void raiseLever ( ) {
-        lanchLever.setPosition(1);
-    }
-
-    public void lowerLever() {
-        lanchLever.setPosition(leverLowPosition);
-    }
 
 }

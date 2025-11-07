@@ -7,17 +7,17 @@ import com.arcrobotics.ftclib.controller.PIDFController;
 import com.qualcomm.hardware.rev.RevTouchSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.SwitchableLight;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.opencv.ml.EM;
 
-import java.util.Collection;
 import java.util.stream.IntStream;
 
 /**
@@ -59,12 +59,38 @@ public class CarouelController {
     private double turnKD = 0.002;
     private double turnKF = 0.0;
 
+    private boolean intakeMode = false;
+    private final int intakeOffset = 56;
     HardwareMap hardwareMap;
 
     NormalizedColorSensor[] colorSensors = new NormalizedColorSensor[3];
 
+    private DcMotor launcher = null;
+    private float launcherPower = 0;
+
+    public final float  LAUNCH_POWER  = (float) 0.8 ;
+    private Servo lanchLever = null;
+    private final float leverLowPosition =(float) 0.3;
+
     public DcMotorEx carouel = null;
     public RevTouchSensor meg = null;
+
+    public float getLauncherPower() {
+        return launcherPower;
+    }
+
+    public void setLauncherPower (float power ) {
+        launcherPower=power;
+        launcher.setPower(power);
+    }
+
+    public void raiseLever ( ) {
+        lanchLever.setPosition(1);
+    }
+
+    public void lowerLever() {
+        lanchLever.setPosition(leverLowPosition);
+    }
 
     public double getTurnKD() {
         return turnKD;
@@ -97,7 +123,7 @@ public class CarouelController {
     /**
      * Encoder counter for 360 degress.
      */
-    private int oneCircle = 538;
+    private final int oneCircle = 530;
 
     private Telemetry tel;
 
@@ -137,6 +163,13 @@ public class CarouelController {
         //Init Magenetic limit switch.
         meg = hardwareMap.get(RevTouchSensor.class, "meg");
 
+        launcher = hardwareMap.get(DcMotorEx.class,"launcher");
+        launcher.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        launcher.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        lanchLever = hardwareMap.get(Servo.class,"launchLever");
+        lanchLever.setPosition(leverLowPosition);
+
     }
 
     /**
@@ -153,13 +186,14 @@ public class CarouelController {
         }
 
         //Start spining
-        carouel.setVelocity(-500);
+        carouel.setVelocity(-100);
         while (!meg.isPressed()) {
-            //currentPosition = carouel.getCurrentPosition();
-            //Log.d("9010","Position with MagLimit" + currentPosition);
+            currentPosition = carouel.getCurrentPosition();
+            Log.d("9010","Position with MagLimit: " + currentPosition);
         }
         carouel.setVelocity(0);
 
+        /*
         try {
             Thread.sleep(500);
         } catch (Exception ex) {
@@ -167,19 +201,43 @@ public class CarouelController {
             Log.d("9010", ex.toString());
         }
         //Start spining in reverse, but slower.
-        carouel.setVelocity(80);
+        carouel.setVelocity(50);
 
         while (!meg.isPressed()) {
-            //currentPosition = carouel.getCurrentPosition();
-            //Log.d("9010","Position with MagLimit backward" + currentPosition);
+            currentPosition = carouel.getCurrentPosition();
+            Log.d("9010","Position with MagLimit backward: " + currentPosition);
         }
         carouel.setVelocity(0);
+          */
+        currentPosition = carouel.getCurrentPosition();
+        Log.d("9010", "Position after stop: " + currentPosition);
 
-        Log.d("9010", "Position after stop: " + carouel.getCurrentPosition());
+        //Move antoher angle for the launch position
+        moveToPosition(currentPosition-24 , 3 );
 
         carouel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         carouel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+    }
+
+    public void alignIntake() {
+        intakeMode = true;
+        int currentPos = carouel.getCurrentPosition();
+        moveToPosition( currentPos - intakeOffset, 3  );
+    }
+
+    public void alignShoot() {
+        intakeMode = false;
+        int currentPos = carouel.getCurrentPosition();
+        moveToPosition( currentPos + intakeOffset, 3  );
+    }
+
+    public boolean isIntakeMode() {
+        return intakeMode;
+    }
+
+    public void setIntakeMode(boolean intakeMode) {
+        this.intakeMode = intakeMode;
     }
 
     /**
@@ -190,8 +248,11 @@ public class CarouelController {
         int startPosition = carouel.getCurrentPosition();
         //Figure out if initial position inside which slot.
         //Slot 1 : 0,  Slot 1:  179,  Slot 2: 538
-        int currentSlotNumber = (int) Math.round((float) startPosition / 179);
+        int currentSlotNumber = (int) Math.round((float) startPosition / (oneCircle/3));
         int regulatedCurrentPosition = currentSlotNumber * (oneCircle / 3);
+        if ( intakeMode) {
+            regulatedCurrentPosition-=intakeOffset;
+        }
         Log.d("9010", " start Position: " + startPosition + "Regulated start: " + regulatedCurrentPosition);
 
         int targetPosition = regulatedCurrentPosition + oneCircle / 3;
@@ -213,8 +274,11 @@ public class CarouelController {
         int startPosition = carouel.getCurrentPosition();
         //Figure out if initial position inside which slot.
         //Slot 1 : 0,  Slot 1:  179,  Slot 2: 538
-        int currentSlotNumber = (int) Math.round((float) startPosition / 179);
+        int currentSlotNumber = (int) Math.round((float) startPosition / (oneCircle/3));
         int regulatedCurrentPosition = currentSlotNumber * (oneCircle / 3);
+        if ( intakeMode) {
+            regulatedCurrentPosition-=intakeOffset;
+        }
         //Log.d("9010", " start Position: " + startPosition + "Regulated start: " + regulatedCurrentPosition);
 
         int targetPosition = regulatedCurrentPosition - oneCircle / 3;
@@ -395,21 +459,27 @@ public class CarouelController {
      * After shooting, set ball position 0 to empty.
      */
     public void shootBall() {
-        //After shoot ball, position 0 becomes empty
-        ballConfiguration[0]=EMPTY;
-        Log.d("9010", "After shoot ball, ball config: "
-                + ballConfiguration[0] + " " + ballConfiguration[1] + " " + ballConfiguration[2]);
-        if ( ballConfiguration[1]==EMPTY  && ballConfiguration[2]==EMPTY ) {
-            //All 3 empty, set read flag.
-            configReadNeeded = true;
-        }
-        tel.addData("Ball Config: [" , ballConfiguration[0] + "] [" +
-                ballConfiguration[1] + "] ["+ ballConfiguration[2]+"]");
-        tel.addData("read needed:" , configReadNeeded);
-        tel.update();
-
         try {
-            Thread.sleep(1000);
+            //Sping launcher
+            //setLauncherPower(LAUNCH_POWER);
+            raiseLever();
+            Thread.sleep(700);
+            lowerLever();
+            //setLauncherPower(0);
+
+            //After shoot ball, position 0 becomes empty
+            ballConfiguration[0]=EMPTY;
+            Log.d("9010", "After shoot ball, ball config: "
+                    + ballConfiguration[0] + " " + ballConfiguration[1] + " " + ballConfiguration[2]);
+            if ( ballConfiguration[1]==EMPTY  && ballConfiguration[2]==EMPTY ) {
+                //All 3 empty, set read flag.
+                configReadNeeded = true;
+            }
+            tel.addData("Ball Config: [" , ballConfiguration[0] + "] [" +
+                    ballConfiguration[1] + "] ["+ ballConfiguration[2]+"]");
+            tel.addData("read needed:" , configReadNeeded);
+            tel.update();
+
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

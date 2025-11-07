@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
+import org.firstinspires.ftc.teamcode.hardware.CarouelController;
 import org.firstinspires.ftc.teamcode.hardware.Hardware2026;
 import org.firstinspires.ftc.teamcode.hardware.MecanumWheels2023;
 
@@ -13,10 +14,13 @@ public class GeneralDriver2026 extends LinearOpMode {
     Hardware2026 hdw;
 
     MecanumWheels2023 robotWheel;
-
+    CarouelController car;
 
     @Override
     public void runOpMode() throws InterruptedException {
+        car = new CarouelController(hardwareMap, telemetry);
+        car.initialize();
+
         hdw = new Hardware2026(hardwareMap, telemetry); //init hardware
         hdw.createHardware();
         robotWheel = new MecanumWheels2023();
@@ -25,6 +29,7 @@ public class GeneralDriver2026 extends LinearOpMode {
 
         telemetry.addData("[>]", "All set?");
         telemetry.update();
+        car.initPosition();
 
         waitForStart();
         telemetry.clearAll();
@@ -52,24 +57,46 @@ public class GeneralDriver2026 extends LinearOpMode {
                 if ( hdw.getIntakePower()!=0 ) {
                     hdw.setIntakePower(0);
                 } else {
-                    hdw.setIntakePower(1);
+                    hdw.setIntakePower(hdw.INTAKE_POWER);
                 }
-            }
-            if (!previousGamePad1.y && currentGamePad1.y) {
-                if ( hdw.getLauncherPower()!=0 ) {
-                    hdw.setLauncherPower(0);
-                } else {
-                    hdw.setLauncherPower((float) 0.5);
-                }
-            }
-            
-            if (currentGamePad1.a) {
-                hdw.raiseLever();
-            }
-            if (currentGamePad1.b) {
-                hdw.lowerLever();
             }
 
+            if (!previousGamePad1.y && currentGamePad1.y) {
+                if ( car.getLauncherPower()!=0 ) {
+                    car.setLauncherPower(0);
+                } else {
+                    car.setLauncherPower(car.LAUNCH_POWER);
+                }
+            }
+
+            if (gamepad1.back) {
+                car.initPosition();
+            }
+
+
+            if (currentGamePad1.a) {
+                car.rotateOneSlotCCW();
+            }
+            if (currentGamePad1.b) {
+                car.rotateOneSlotCW();
+            }
+
+            if (currentGamePad1.dpad_down) {
+                car.alignShoot();
+            }
+            if (currentGamePad1.dpad_up) {
+                car.alignIntake();
+            }
+            if ( currentGamePad1.dpad_left){
+                car.shootBall();
+            }
+
+            if ( currentGamePad1.left_bumper){
+                car.shootGreen();
+            }
+            if (currentGamePad1.right_bumper) {
+                car.shootPurple();
+            }
 
         }
 
