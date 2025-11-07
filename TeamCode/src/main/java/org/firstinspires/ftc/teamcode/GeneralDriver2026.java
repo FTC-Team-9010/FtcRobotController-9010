@@ -48,6 +48,28 @@ public class GeneralDriver2026 extends LinearOpMode {
             hdw.wheelFrontRight.setVelocity(robotWheel.wheelFrontRightPower * Hardware2026.ANGULAR_RATE);
             hdw.wheelBackRight.setVelocity(robotWheel.wheelBackRightPower * Hardware2026.ANGULAR_RATE);
 
+            if (!previousGamePad1.x && currentGamePad1.x) {
+                if ( hdw.getIntakePower()!=0 ) {
+                    hdw.setIntakePower(0);
+                } else {
+                    hdw.setIntakePower(1);
+                }
+            }
+            if (!previousGamePad1.y && currentGamePad1.y) {
+                if ( hdw.getLauncherPower()!=0 ) {
+                    hdw.setLauncherPower(0);
+                } else {
+                    hdw.setLauncherPower((float) 0.5);
+                }
+            }
+            
+            if (currentGamePad1.a) {
+                hdw.raiseLever();
+            }
+            if (currentGamePad1.b) {
+                hdw.lowerLever();
+            }
+
 
         }
 

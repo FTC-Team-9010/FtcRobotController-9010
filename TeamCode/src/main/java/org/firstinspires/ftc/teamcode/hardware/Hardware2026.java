@@ -10,7 +10,9 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
@@ -34,7 +36,14 @@ public class Hardware2026 {
     public DcMotorEx wheelBackRight = null;
     public DcMotorEx wheelBackLeft = null;
 
-    public DcMotorEx launcher = null;
+    private DcMotor launcher = null;
+    private float launcherPower = 0;
+    private DcMotor intake = null;
+    private float intakePower = 0 ;
+
+    private Servo lanchLever = null;
+    private final float leverLowPosition =(float) 0.3;
+
 
     //declare GoBuilda Odometry
     GoBildaPinpointDriver odo;
@@ -61,6 +70,13 @@ public class Hardware2026 {
         telemetry = tm;
     }
 
+    public float getIntakePower() {
+        return intakePower;
+    }
+
+    public float getLauncherPower() {
+        return launcherPower;
+    }
 
     public void createHardware() {
         //Initialize LimeLite
@@ -68,7 +84,6 @@ public class Hardware2026 {
         limelight.pipelineSwitch(0);
         limelight.start();
 
-        /*
         wheelFrontRight = hwMap.get(DcMotorEx.class,"rfWheel");
         wheelFrontLeft = hwMap.get(DcMotorEx.class, "lfWheel");
         wheelBackRight = hwMap.get(DcMotorEx.class, "rrWheel");
@@ -89,24 +104,35 @@ public class Hardware2026 {
         wheelFrontLeft.setVelocity(0);
         wheelBackLeft.setVelocity(0);
 
+        launcher = hwMap.get(DcMotorEx.class,"launcher");
+        launcher.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        launcher.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        intake = hwMap.get(DcMotorEx.class,"intake");
+        intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        intake.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        lanchLever = hwMap.get(Servo.class,"launchLever");
+        lanchLever.setPosition(leverLowPosition);
+
         //init GoBuilda Odameter
         odo = hwMap.get(GoBildaPinpointDriver.class, "odo");
 
-        //TODO: Modidfy these offsets to match 2026 Season robot
-        odo.setOffsets(85, -125);
-*/
+        //X pod is 4 inch on the right of center,  Y pod is 2 inch behind the center.
+        odo.setOffsets(-101, -52);
+
         /*
         Set the kind of pods used by your robot. If you're using goBILDA odometry pods, select either
         the goBILDA_SWINGARM_POD, or the goBILDA_4_BAR_POD.
         If you're using another kind of odometry pod, uncomment setEncoderResolution and input the
         number of ticks per mm of your odometry pod.
          */
-        //odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+        odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
 
         /*
           Please refer to Go Builder Example.
          */
-        //odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD,GoBildaPinpointDriver.EncoderDirection.FORWARD);
+        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD,GoBildaPinpointDriver.EncoderDirection.FORWARD);
 
         /*
         Before running the robot, recalibrate the IMU. This needs to happen when the robot is stationary
@@ -116,7 +142,8 @@ public class Hardware2026 {
         This is recommended before you run your autonomous, as a bad initial calibration can cause
         an incorrect starting value for x, y, and heading.
          */
-        //odo.resetPosAndIMU();
+        odo.resetPosAndIMU();
+
 
     }
 
@@ -317,24 +344,22 @@ public class Hardware2026 {
 
     }
 
-    /*
-    public void intakeOn() {
-        intake.setPower(1);
+    public void setIntakePower ( float power ) {
+        intakePower=power;
+        intake.setPower(power );
     }
 
-    public void intakeOff() {
-        intake.setPower(0);
+    public void setLauncherPower (float power ) {
+        launcherPower=power;
+        launcher.setPower(power);
     }
 
-    public void launcherOn() {
-        launcher.setPower(1);
+    public void raiseLever ( ) {
+        lanchLever.setPosition(1);
     }
 
-    public void launcherOff() {
-        launcher.setPower(0);
+    public void lowerLever() {
+        lanchLever.setPosition(leverLowPosition);
     }
-
-     */
-
 
 }
