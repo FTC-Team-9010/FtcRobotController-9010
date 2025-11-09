@@ -59,7 +59,7 @@ public class Hardware2026 {
 
     public Telemetry telemetry;
 
-    static public double ANGULAR_RATE = 2000;
+    static public double ANGULAR_RATE = 2500;
 
     public Hardware2026(HardwareMap m, Telemetry tm) {
         hwMap = m;

@@ -25,7 +25,7 @@ public class GeneralDriver2026 extends LinearOpMode {
         hdw.createHardware();
         robotWheel = new MecanumWheels2023();
 
-        double turbo = .6;
+        double turbo = 1;
 
         telemetry.addData("[>]", "All set?");
         telemetry.update();
@@ -48,16 +48,19 @@ public class GeneralDriver2026 extends LinearOpMode {
 
             robotWheel.joystick(gamepad1, turbo);
 
+
             hdw.wheelFrontLeft.setVelocity(robotWheel.wheelFrontLeftPower * Hardware2026.ANGULAR_RATE);
             hdw.wheelBackLeft.setVelocity(robotWheel.wheelBackLeftPower * Hardware2026.ANGULAR_RATE);
             hdw.wheelFrontRight.setVelocity(robotWheel.wheelFrontRightPower * Hardware2026.ANGULAR_RATE);
             hdw.wheelBackRight.setVelocity(robotWheel.wheelBackRightPower * Hardware2026.ANGULAR_RATE);
+
 
             if (!previousGamePad1.x && currentGamePad1.x) {
                 if ( hdw.getIntakePower()!=0 ) {
                     hdw.setIntakePower(0);
                 } else {
                     hdw.setIntakePower(hdw.INTAKE_POWER);
+                    car.alignIntake();
                 }
             }
 
@@ -66,6 +69,7 @@ public class GeneralDriver2026 extends LinearOpMode {
                     car.setLauncherPower(0);
                 } else {
                     car.setLauncherPower(car.LAUNCH_POWER);
+                    car.alignShoot();
                 }
             }
 
@@ -83,6 +87,7 @@ public class GeneralDriver2026 extends LinearOpMode {
 
             if (currentGamePad1.dpad_down) {
                 car.alignShoot();
+
             }
             if (currentGamePad1.dpad_up) {
                 car.alignIntake();
