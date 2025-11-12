@@ -68,7 +68,7 @@ public class GeneralDriver2026 extends LinearOpMode {
                 if ( car.getLauncherPower()!=0 ) {
                     car.setLauncherPower(0);
                 } else {
-                    car.setLauncherPower(car.LAUNCH_POWER);
+                    car.setLauncherPower(car.presetLaunchPower);
                     car.alignShoot();
                 }
             }
@@ -97,10 +97,15 @@ public class GeneralDriver2026 extends LinearOpMode {
             }
 
             if ( currentGamePad1.left_bumper){
-                car.shootGreen();
+                car.presetLaunchPower += .1;
+                telemetry.addData("Current Launcher Power (0-1): ",car.presetLaunchPower);
+                telemetry.update();
             }
             if (currentGamePad1.right_bumper) {
-                car.shootPurple();
+                car.presetLaunchPower -= .1;
+                telemetry.addData("Current Launcher Power (0-1): ",car.presetLaunchPower);
+                telemetry.update();
+
             }
 
         }

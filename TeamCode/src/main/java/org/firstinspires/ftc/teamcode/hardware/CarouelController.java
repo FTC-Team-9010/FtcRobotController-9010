@@ -68,7 +68,7 @@ public class CarouelController {
     private DcMotor launcher = null;
     private float launcherPower = 0;
 
-    public final float  LAUNCH_POWER  = (float) 0.8 ;
+    public float presetLaunchPower = (float) 0.8 ;
     private Servo lanchLever = null;
     private final float leverLowPosition =(float) 0.3;
 
@@ -461,7 +461,7 @@ public class CarouelController {
     public void shootBall() {
         try {
             //Sping launcher
-            //setLauncherPower(LAUNCH_POWER);
+            //setLauncherPower(presetLaunchPower);
             raiseLever();
             Thread.sleep(700);
             lowerLever();
