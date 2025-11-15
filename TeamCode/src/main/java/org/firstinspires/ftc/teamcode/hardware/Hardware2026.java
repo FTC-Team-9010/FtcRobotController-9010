@@ -66,6 +66,78 @@ public class Hardware2026 {
         telemetry = tm;
     }
 
+    public double getTurnKP() {
+        return turnKP;
+    }
+
+    public void setTurnKP(double turnKP) {
+        this.turnKP = turnKP;
+    }
+
+    public double getTurnKI() {
+        return turnKI;
+    }
+
+    public void setTurnKI(double turnKI) {
+        this.turnKI = turnKI;
+    }
+
+    public double getTurnKD() {
+        return turnKD;
+    }
+
+    public void setTurnKD(double turnKD) {
+        this.turnKD = turnKD;
+    }
+
+    public double getTurnKF() {
+        return turnKF;
+    }
+
+    public void setTurnKF(double turnKF) {
+        this.turnKF = turnKF;
+    }
+
+    public double getLnKP() {
+        return lnKP;
+    }
+
+    public void setLnKP(double lnKP) {
+        this.lnKP = lnKP;
+    }
+
+    public double getLnKI() {
+        return lnKI;
+    }
+
+    public void setLnKI(double lnKI) {
+        this.lnKI = lnKI;
+    }
+
+    public double getLnKD() {
+        return lnKD;
+    }
+
+    public void setLnKD(double lnKD) {
+        this.lnKD = lnKD;
+    }
+
+    public double getLnKF() {
+        return lnKF;
+    }
+
+    public void setLnKF(double lnKF) {
+        this.lnKF = lnKF;
+    }
+
+    public double getMoveTimeOut() {
+        return moveTimeOut;
+    }
+
+    public void setMoveTimeOut(double moveTimeOut) {
+        this.moveTimeOut = moveTimeOut;
+    }
+
     public float getIntakePower() {
         return intakePower;
     }
@@ -119,7 +191,7 @@ public class Hardware2026 {
         /*
           Please refer to Go Builder Example.
          */
-        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD,GoBildaPinpointDriver.EncoderDirection.FORWARD);
+        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD,GoBildaPinpointDriver.EncoderDirection.REVERSED);
 
         /*
         Before running the robot, recalibrate the IMU. This needs to happen when the robot is stationary
@@ -130,8 +202,6 @@ public class Hardware2026 {
         an incorrect starting value for x, y, and heading.
          */
         odo.resetPosAndIMU();
-
-
     }
 
     /**

@@ -45,9 +45,7 @@ public class GeneralDriver2026 extends LinearOpMode {
             //Update current gamepad status
             currentGamePad1.copy(gamepad1);
 
-
             robotWheel.joystick(gamepad1, turbo);
-
 
             hdw.wheelFrontLeft.setVelocity(robotWheel.wheelFrontLeftPower * Hardware2026.ANGULAR_RATE);
             hdw.wheelBackLeft.setVelocity(robotWheel.wheelBackLeftPower * Hardware2026.ANGULAR_RATE);
@@ -100,11 +98,13 @@ public class GeneralDriver2026 extends LinearOpMode {
                 car.presetLaunchPower += .1;
                 telemetry.addData("Current Launcher Power (0-1): ",car.presetLaunchPower);
                 telemetry.update();
+                sleep(100);
             }
             if (currentGamePad1.right_bumper) {
                 car.presetLaunchPower -= .1;
                 telemetry.addData("Current Launcher Power (0-1): ",car.presetLaunchPower);
                 telemetry.update();
+                sleep(100);
 
             }
 
