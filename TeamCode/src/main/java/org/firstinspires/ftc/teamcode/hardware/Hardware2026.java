@@ -55,7 +55,7 @@ public class Hardware2026 {
     private double lnKD = 1.4;
     private double lnKF = 0.0;
 
-    private double moveTimeOut = 7000;
+    private double moveTimeOut = 5000;
 
     public Telemetry telemetry;
 
@@ -231,8 +231,8 @@ public class Hardware2026 {
      * april tag
      *
      * @param tagId    Id of the tag to be used for reference.
-     * @param targetY   distance of robot to the april tag,  unit in inches.
-     * @param targetX   horizontal shift to the center of april tag.  unit in inches.  Positive
+     * @param targetY   distance of robot to the april tag,  unit in mm.
+     * @param targetX   horizontal shift to the center of april tag.  unit in mm.  Positive
      *                  means tag is on the right of robot camera.
      */
     public void moveByAprilTag( int tagId,  double targetY  ,  double targetX  ) throws InterruptedException {
@@ -242,7 +242,8 @@ public class Hardware2026 {
         //Center of robot to the camera,
         double cameraRadius = 6.875 ;
 
-        Log.d("9010", "in MoveByApril Tag, Target Tag is: "  + tagId );
+        Log.d("9010", "in MoveByApril Tag, Target Tag is: "  + tagId
+         + " Target X: " + targetX +  " Target Y: " + targetY);
 
         //Start April Tag detection fo find tag, possible multiple tag in camera frame,
         //So result is a list.
@@ -257,15 +258,18 @@ public class Hardware2026 {
                         //double xToTag = fr.getTargetPoseCameraSpace().getPosition().x*1000;
                         //Log.d("9010", "xToTag: " + xToTag) ;
 
-                        double yawToTag  = fr.getTargetPoseCameraSpace().getOrientation().getYaw();
-                        double rangeToTag = fr.getTargetPoseCameraSpace().getPosition().z*1000;
-                        Log.d("9010", " Yaw " + yawToTag + "range: " + rangeToTag);
+                        double yawToTag  = fr.getTargetPoseCameraSpace().getOrientation().getPitch();
+                        double yToTag = fr.getTargetPoseCameraSpace().getPosition().z*1000;
+                        double xToTag = fr.getTargetPoseCameraSpace().getPosition().y*1000;
+                        Log.d("9010", " Yaw " + yawToTag );
 
-                        double newX= rangeToTag * Math.sin( Math.toRadians( - yawToTag)  );
-                        double newY = rangeToTag * Math.cos(Math.toRadians( - yawToTag));
+                        //double newX= rangeToTag * Math.sin( Math.toRadians( - yawToTag)  );
+                        //double newY = rangeToTag * Math.cos(Math.toRadians( - yawToTag));
 
-                        //Move by odometer.
-                        this.moveToXYPosition(newX - targetX , newY - targetY, yawToTag-yawOffset);
+                        Log.d("9010","X ToTag: " + xToTag + " Y to Tag: " + yToTag);
+                        //Move by odometer. Note that go BUilder Odo
+                        // X is forward/backward.
+                        this.moveToXYPosition(yToTag - targetY,targetX - xToTag,  yawOffset - yawToTag);
 
                     }
                 }
@@ -398,6 +402,10 @@ public class Hardware2026 {
             wheelBackRight.setVelocity(backRightVelocity);
         }
 
+        wheelFrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        wheelBackLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        wheelFrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        wheelBackRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
     }
 

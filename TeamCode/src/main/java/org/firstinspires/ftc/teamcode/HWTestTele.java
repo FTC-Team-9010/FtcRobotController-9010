@@ -65,7 +65,7 @@ public class HWTestTele  extends LinearOpMode {
                 hdw.setLnKP(pidCoffs[0]);
                 hdw.setLnKI(pidCoffs[1]);
                 hdw.setLnKD(pidCoffs[2]);
-                hdw.moveToXYPosition (-450, 0, 0 );
+                hdw.moveByAprilTag(20, 1500, 0);
             }
 
             if( gamepad1.x) {
