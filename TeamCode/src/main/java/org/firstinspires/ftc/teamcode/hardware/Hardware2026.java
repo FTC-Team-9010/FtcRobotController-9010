@@ -50,9 +50,9 @@ public class Hardware2026 {
     private double turnKD = 0.5;
     private double turnKF = 0.0;
 
-    private double lnKP = 3.5;
-    private double lnKI = 0.8;
-    private double lnKD = 1.4;
+    private double lnKP = 12;
+    private double lnKI = 1;
+    private double lnKD = 2.6;
     private double lnKF = 0.0;
 
     private double moveTimeOut = 5000;
@@ -254,23 +254,23 @@ public class Hardware2026 {
             for (LLResultTypes.FiducialResult fr : fiducialResults) {
                     if ( fr.getFiducialId() == tagId) {
                         //Here we found our target April Tag.
-                        //Get Initial Error
-                        //double xToTag = fr.getTargetPoseCameraSpace().getPosition().x*1000;
-                        //Log.d("9010", "xToTag: " + xToTag) ;
-
                         double yawToTag  = fr.getTargetPoseCameraSpace().getOrientation().getPitch();
                         double yToTag = fr.getTargetPoseCameraSpace().getPosition().z*1000;
                         double xToTag = fr.getTargetPoseCameraSpace().getPosition().y*1000;
-                        Log.d("9010", " Yaw " + yawToTag );
+                        double rangeToTag = Math.sqrt( Math.pow(xToTag, 2) + Math.pow(yToTag, 2));
 
-                        //double newX= rangeToTag * Math.sin( Math.toRadians( - yawToTag)  );
-                        //double newY = rangeToTag * Math.cos(Math.toRadians( - yawToTag));
+                        Log.d("9010", " Yaw: " + yawToTag + " Range:  " + rangeToTag +
+                         " x to Tag: " + xToTag +  " Y to Tag: " + yToTag);
+                        double alpha = 90 - result.getTx() + yawToTag;
 
-                        Log.d("9010","X ToTag: " + xToTag + " Y to Tag: " + yToTag);
+                        double newX= rangeToTag * Math.cos( Math.toRadians( alpha)  );
+                        double newY = rangeToTag * Math.sin(Math.toRadians(alpha));
+
+                        Log.d("9010","nX ToTag: " + newX + "nY to Tag: " + newY + " alpha to Yag: " + alpha
+                        + " Yaw to Tag: " + yawToTag);
                         //Move by odometer. Note that go BUilder Odo
                         // X is forward/backward.
-                        this.moveToXYPosition(yToTag - targetY,targetX - xToTag,  yawOffset - yawToTag);
-
+                        this.moveToXYPosition(newY - targetY, targetX-newX, -yawToTag);
                     }
                 }
 
@@ -339,17 +339,17 @@ public class Hardware2026 {
         Log.d("9010", "turnKp: " + turnKP + "  lnKI: " + turnKI + " turnKD: " + turnKD);
 
         lnYPidfCrtler.setSetPoint(0);
-        lnYPidfCrtler.setTolerance(10);
+        lnYPidfCrtler.setTolerance(50);
         //set Integration to avoid saturating PID output.
         lnYPidfCrtler.setIntegrationBounds(-1000, 1000);
 
         lnXPidfCrtler.setSetPoint(0);
-        lnXPidfCrtler.setTolerance(10);
+        lnXPidfCrtler.setTolerance(50);
         lnXPidfCrtler.setIntegrationBounds(-1000, 1000);
 
         turnPidfCrtler.setSetPoint(0);
         //Set tolerance as 0.5 degrees
-        turnPidfCrtler.setTolerance(1);
+        turnPidfCrtler.setTolerance(3);
         turnPidfCrtler.setIntegrationBounds(-1, 1);
 
         Log.d("9010", "Before entering Loop ");
@@ -406,6 +406,9 @@ public class Hardware2026 {
         wheelBackLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         wheelFrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         wheelBackRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        Log.d("9010", "current X Position after move: " + currenXPosition);
+
 
     }
 

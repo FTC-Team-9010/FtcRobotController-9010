@@ -75,7 +75,6 @@ public class GeneralDriver2026 extends LinearOpMode {
                 car.initPosition();
             }
 
-
             if (currentGamePad1.a) {
                 car.rotateOneSlotCCW();
             }
@@ -92,6 +91,9 @@ public class GeneralDriver2026 extends LinearOpMode {
             }
             if ( currentGamePad1.dpad_left){
                 car.shootBall();
+            }
+            if (currentGamePad1.dpad_right) {
+                hdw.moveByAprilTag(20,1000,0 );
             }
 
             if ( currentGamePad1.left_bumper){
