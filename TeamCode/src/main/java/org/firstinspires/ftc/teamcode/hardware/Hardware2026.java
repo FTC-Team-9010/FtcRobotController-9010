@@ -259,15 +259,14 @@ public class Hardware2026 {
                         double xToTag = fr.getTargetPoseCameraSpace().getPosition().y*1000;
                         double rangeToTag = Math.sqrt( Math.pow(xToTag, 2) + Math.pow(yToTag, 2));
 
-                        Log.d("9010", " Yaw: " + yawToTag + " Range:  " + rangeToTag +
-                         " x to Tag: " + xToTag +  " Y to Tag: " + yToTag);
+                        Log.d("9010", " Yaw: " + yawToTag + " Range:  " + rangeToTag);
+                        Log.d( "9010", " x to Tag: " + xToTag +  " Y to Tag: " + yToTag);
                         double alpha = 90 - result.getTx() + yawToTag;
 
                         double newX= rangeToTag * Math.cos( Math.toRadians( alpha)  );
                         double newY = rangeToTag * Math.sin(Math.toRadians(alpha));
 
-                        Log.d("9010","nX ToTag: " + newX + "nY to Tag: " + newY + " alpha to Yag: " + alpha
-                        + " Yaw to Tag: " + yawToTag);
+                        Log.d("9010","nX ToTag: " + newX + "nY to Tag: " + newY + " alpha to Tag: " + alpha);
                         //Move by odometer. Note that go BUilder Odo
                         // X is forward/backward.
                         this.moveToXYPosition(newY - targetY, targetX-newX, -yawToTag);
@@ -290,7 +289,8 @@ public class Hardware2026 {
      * @param heading Target heading, in degress,  Positive to turn left, negative to turn right.
      */
     public void moveToXYPosition(double x, double y, double heading) throws InterruptedException {
-        Log.d("9010", "Entering into moveToXYPosition ");
+        Log.d("9010", "Entering into moveToXYPosition , x: " + x + " Y:" + y
+                + " heading: " + heading);
 
         wheelFrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         wheelBackLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -306,24 +306,20 @@ public class Hardware2026 {
         odo.resetPosAndIMU();
         odo.bulkUpdate();
         while (odo.getDeviceStatus() != GoBildaPinpointDriver.DeviceStatus.READY) {
-            Log.d("9010", "Status: " + odo.getDeviceStatus());
-            Thread.sleep(10);
+            Thread.sleep(20);
             odo.bulkUpdate();
         }
+        Log.d("9010", "Status: " + odo.getDeviceStatus());
 
-        odo.bulkUpdate();
         Pose2D initPos = odo.getPosition();
         Pose2D currentPos = null;
 
         //Before start, get init position and heading
         double currenXPosition = initPos.getX(DistanceUnit.MM);
-        Log.d("9010", "current X Position " + currenXPosition);
 
         double currenYPosition = initPos.getY(DistanceUnit.MM);
-        Log.d("9010", "current Y Position " + currenYPosition);
 
         double startHeading = initPos.getHeading(AngleUnit.DEGREES);
-        Log.d("9010", "current Heading:  " + startHeading);
 
         double targetXPosition = currenXPosition + x;
         double targetYPosition = currenYPosition + y;
@@ -331,40 +327,44 @@ public class Hardware2026 {
 
         //Initialize PID Controller
         PIDFController lnYPidfCrtler = new PIDFController(lnKP, lnKI, lnKD, lnKF);
-        Log.d("9010", "lnYKp: " + lnKP + "  lnKI: " + lnKI + " lnKD: " + lnKD);
+        //Log.d("9010", "lnYKp: " + lnKP + "  lnKI: " + lnKI + " lnKD: " + lnKD);
         //Give X compansation more KP
         PIDFController lnXPidfCrtler = new PIDFController(lnKP, lnKI, lnKD, lnKF);
-        Log.d("9010", "lnXKp: " + lnKP + "  lnXKI: " + lnKI + " lnXKD: " + lnKD);
+        //Log.d("9010", "lnXKp: " + lnKP + "  lnXKI: " + lnKI + " lnXKD: " + lnKD);
         PIDFController turnPidfCrtler = new PIDFController(turnKP, turnKI, turnKD, turnKF);
-        Log.d("9010", "turnKp: " + turnKP + "  lnKI: " + turnKI + " turnKD: " + turnKD);
+        //Log.d("9010", "turnKp: " + turnKP + "  lnKI: " + turnKI + " turnKD: " + turnKD);
 
         lnYPidfCrtler.setSetPoint(0);
-        lnYPidfCrtler.setTolerance(50);
+        lnYPidfCrtler.setTolerance(30);
         //set Integration to avoid saturating PID output.
         lnYPidfCrtler.setIntegrationBounds(-1000, 1000);
 
         lnXPidfCrtler.setSetPoint(0);
-        lnXPidfCrtler.setTolerance(50);
+        lnXPidfCrtler.setTolerance(30);
         lnXPidfCrtler.setIntegrationBounds(-1000, 1000);
 
         turnPidfCrtler.setSetPoint(0);
         //Set tolerance as 0.5 degrees
-        turnPidfCrtler.setTolerance(3);
+        turnPidfCrtler.setTolerance(1.5);
         turnPidfCrtler.setIntegrationBounds(-1, 1);
 
-        Log.d("9010", "Before entering Loop ");
-
+        //Log.d("9010", "Before entering Loop ");
         long initMill = System.currentTimeMillis();
 
         while (!(lnYPidfCrtler.atSetPoint() && lnXPidfCrtler.atSetPoint() && turnPidfCrtler.atSetPoint())
                 && ((System.currentTimeMillis() - initMill) < moveTimeOut)) {
             //Get Odo meter reading
             odo.bulkUpdate();
+            while (odo.getDeviceStatus() != GoBildaPinpointDriver.DeviceStatus.READY) {
+                Thread.sleep(10);
+                odo.bulkUpdate();
+            }
+            //Log.d("9010", "Status: " + odo.getDeviceStatus());
             currentPos = odo.getPosition();
-            /* Log.d ("9010", "odo readings,  X: "   +  currentPos.getX(DistanceUnit.MM)
-                    + " Y: " + currentPos.getY(DistanceUnit.MM)
-                    + " Heading: " + currentPos.getHeading(AngleUnit.DEGREES) );
-            */
+            //Log.d ("9010", "odo readings,  X: "   +  currentPos.getX(DistanceUnit.MM)
+            //        + " Y: " + currentPos.getY(DistanceUnit.MM)
+            //        + " Heading: " + currentPos.getHeading(AngleUnit.DEGREES) );
+
             //Reverse X and Y, Gobuilda PinPoint odo meter has X on Foward, and Y on Strafe
             double velocityXCaculated = lnYPidfCrtler.calculate(targetYPosition - currentPos.getY(DistanceUnit.MM));
             double velocityYCaculated = lnXPidfCrtler.calculate(targetXPosition - currentPos.getX(DistanceUnit.MM));
@@ -402,13 +402,21 @@ public class Hardware2026 {
             wheelBackRight.setVelocity(backRightVelocity);
         }
 
+        Log.d ("9010", "odo readings after move,  X: "   +  currentPos.getX(DistanceUnit.MM)
+                + " Y: " + currentPos.getY(DistanceUnit.MM)
+                + " Heading: " + currentPos.getHeading(AngleUnit.DEGREES) );
+
+        Log.d("9010", "Before Stop");
+        wheelFrontLeft.setVelocity(0);
+        wheelBackLeft.setVelocity(0);
+        wheelFrontRight.setVelocity(0);
+        wheelBackRight.setVelocity(0);
+
         wheelFrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         wheelBackLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         wheelFrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         wheelBackRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        Log.d("9010", "current X Position after move: " + currenXPosition);
-
+        Log.d("9010", "After Stop wheels");
 
     }
 
