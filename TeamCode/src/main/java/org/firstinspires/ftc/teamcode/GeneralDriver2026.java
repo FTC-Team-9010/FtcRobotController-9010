@@ -1,11 +1,14 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.hardware.CarouelController;
 import org.firstinspires.ftc.teamcode.hardware.Hardware2026;
+import org.firstinspires.ftc.teamcode.hardware.MecanumWheels2022;
 import org.firstinspires.ftc.teamcode.hardware.MecanumWheels2023;
 
 @TeleOp(name="GeneralDriver2026", group="TeleOps")
@@ -47,6 +50,11 @@ public class GeneralDriver2026 extends LinearOpMode {
 
             robotWheel.joystick(gamepad1, turbo);
 
+            Log.d("9010", "lfWheel Power:" + robotWheel.wheelFrontLeftPower);
+            Log.d("9010", "lrWheel Power:" + robotWheel.wheelFrontRightPower);
+
+            //Log.d("9010", "lfWheel Velocity:" + robotWheel.wheelFrontLeftPower*Hardware2026.ANGULAR_RATE);
+
             hdw.wheelFrontLeft.setVelocity(robotWheel.wheelFrontLeftPower * Hardware2026.ANGULAR_RATE);
             hdw.wheelBackLeft.setVelocity(robotWheel.wheelBackLeftPower * Hardware2026.ANGULAR_RATE);
             hdw.wheelFrontRight.setVelocity(robotWheel.wheelFrontRightPower * Hardware2026.ANGULAR_RATE);
@@ -67,7 +75,7 @@ public class GeneralDriver2026 extends LinearOpMode {
                     car.setLauncherPower(0);
                 } else {
                     car.setLauncherPower(car.presetLaunchPower);
-                    car.alignShoot();
+                    //car.alignShoot();
                 }
             }
 
@@ -76,10 +84,12 @@ public class GeneralDriver2026 extends LinearOpMode {
             }
 
             if (currentGamePad1.a) {
-                car.rotateOneSlotCCW();
+                //car.rotateOneSlotCCW();
+                    car.lowerLever();
             }
             if (currentGamePad1.b) {
-                car.rotateOneSlotCW();
+                //car.rotateOneSlotCW();
+                car.raiseLever();
             }
 
             if (currentGamePad1.dpad_down) {

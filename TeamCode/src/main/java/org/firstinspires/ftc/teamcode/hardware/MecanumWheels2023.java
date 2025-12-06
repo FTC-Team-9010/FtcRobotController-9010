@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 /**
@@ -54,7 +56,7 @@ public class MecanumWheels2023 {
             y = - gamepad1.left_stick_y;
         }
         double rx = gamepad1.right_stick_x;
-
+        Log.d("9010", "ctrl X: " + x + "ctrl Y: " + y + "ctrl rx: " + rx );
         wheelFrontLeftPower   = y - x  - (rx * turnCoff) ;
         wheelBackLeftPower    = y + x - (rx * turnCoff);
         wheelFrontRightPower  = y + x + (rx * turnCoff);
@@ -63,6 +65,7 @@ public class MecanumWheels2023 {
         double max = Math.max(Math.abs(wheelFrontRightPower), Math.max(Math.abs(wheelBackRightPower),
                 Math.max(Math.abs(wheelFrontLeftPower), Math.abs(wheelBackLeftPower))));
 
+        Log.d("9010", "Max: " + max);
         if (max > 1.0)
         {
             wheelFrontRightPower /= max;
@@ -75,6 +78,7 @@ public class MecanumWheels2023 {
         wheelBackRightPower  *= turbo;
         wheelFrontLeftPower  *= turbo;
         wheelBackLeftPower   *= turbo;
+
     }
 
     public void forward(double turbo){

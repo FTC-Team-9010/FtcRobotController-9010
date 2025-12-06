@@ -144,9 +144,13 @@ public class Hardware2026 {
 
     public void createHardware() {
         //Initialize LimeLite
+
+        /* Comment out for drive testing
         limelight = hwMap.get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(0);
         limelight.start();
+        
+         */
 
         wheelFrontRight = hwMap.get(DcMotorEx.class,"rfWheel");
         wheelFrontLeft = hwMap.get(DcMotorEx.class, "lfWheel");
