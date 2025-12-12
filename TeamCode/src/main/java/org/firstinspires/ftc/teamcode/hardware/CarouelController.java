@@ -70,7 +70,8 @@ public class CarouelController {
 
     public float presetLaunchPower = (float) 0.8 ;
     private Servo lanchLever = null;
-    private final float leverLowPosition =(float) 1;
+    //Non-cube bot private final float leverLowPosition =(float) 1;
+    private final float leverLowPosition = (float) 0.0;
 
     public DcMotorEx carouel = null;
     public RevTouchSensor meg = null;
@@ -85,7 +86,8 @@ public class CarouelController {
     }
 
     public void raiseLever ( ) {
-        lanchLever.setPosition(0.3);
+        // Non-cube bot setting lanchLever.setPosition(0.3);
+        lanchLever.setPosition(.3);
     }
 
     public void lowerLever() {
@@ -123,7 +125,7 @@ public class CarouelController {
     /**
      * Encoder counter for 360 degress.
      */
-    private final int oneCircle = 538;
+    private final int oneCircle = 543;
 
     private Telemetry tel;
 

@@ -32,7 +32,7 @@ public class GeneralDriver2026 extends LinearOpMode {
 
         telemetry.addData("[>]", "All set?");
         telemetry.update();
-        car.initPosition();
+        //car.initPosition();
 
         waitForStart();
         telemetry.clearAll();
