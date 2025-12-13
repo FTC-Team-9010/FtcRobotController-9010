@@ -125,7 +125,7 @@ public class CarouelController {
     /**
      * Encoder counter for 360 degress.
      */
-    private final int oneCircle = 543;
+    private final int oneCircle = 538;
 
     private Telemetry tel;
 
@@ -215,7 +215,7 @@ public class CarouelController {
         Log.d("9010", "Position after stop: " + currentPosition);
 
         //Move antoher angle for the launch position
-        moveToPosition(currentPosition-24 , 3 );
+        moveToPosition(currentPosition-72 , 3 );
 
         carouel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         carouel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);

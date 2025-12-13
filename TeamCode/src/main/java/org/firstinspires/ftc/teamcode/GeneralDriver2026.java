@@ -32,7 +32,7 @@ public class GeneralDriver2026 extends LinearOpMode {
 
         telemetry.addData("[>]", "All set?");
         telemetry.update();
-        //car.initPosition();
+        car.initPosition();
 
         waitForStart();
         telemetry.clearAll();
@@ -66,7 +66,7 @@ public class GeneralDriver2026 extends LinearOpMode {
                     hdw.setIntakePower(0);
                 } else {
                     hdw.setIntakePower(hdw.INTAKE_POWER);
-                    car.alignIntake();
+                    //car.alignIntake();
                 }
             }
 
@@ -84,20 +84,19 @@ public class GeneralDriver2026 extends LinearOpMode {
             }
 
             if (currentGamePad1.a) {
-                //car.rotateOneSlotCCW();
-                    car.lowerLever();
+                car.rotateOneSlotCCW();
             }
+
             if (currentGamePad1.b) {
-                //car.rotateOneSlotCW();
-                car.raiseLever();
+                car.rotateOneSlotCW();
             }
 
             if (currentGamePad1.dpad_down) {
-                car.alignShoot();
+                //car.alignShoot();
 
             }
             if (currentGamePad1.dpad_up) {
-                car.alignIntake();
+                //car.alignIntake();
             }
             if ( currentGamePad1.dpad_left){
                 car.shootBall();
