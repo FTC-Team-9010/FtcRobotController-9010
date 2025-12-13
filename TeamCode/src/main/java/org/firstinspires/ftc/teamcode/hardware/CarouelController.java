@@ -68,7 +68,7 @@ public class CarouelController {
     private DcMotor launcher = null;
     private float launcherPower = 0;
 
-    public float presetLaunchPower = (float) 0.8 ;
+    public float presetLaunchPower = (float) 1 ;
     private Servo lanchLever = null;
     //Non-cube bot private final float leverLowPosition =(float) 1;
     private final float leverLowPosition = (float) 0.0;
@@ -371,6 +371,7 @@ public class CarouelController {
      * Read all 3 colors into the ball configuration.
      * after reading, set confReadNeeded flag to false;
      */
+    /*
     public void readBallConfiguration() {
         for (int i = 0; i < 3; i++) {
             float color = this.getHsv(i);
@@ -392,6 +393,8 @@ public class CarouelController {
             configReadNeeded = false;
         }
     }
+
+     */
 
     /**
      * match the ball configuration to the sequence, by rotating the carouel.
@@ -439,6 +442,7 @@ public class CarouelController {
      * This method will call read Ball COnfiguration, and then match configToSequence.
      * THen,  lunch Ball in detected sequence.
      */
+    /*
     public void shootPattern(int decodedGreenIndex) {
         if ( configReadNeeded ) {
             readBallConfiguration();
@@ -455,6 +459,8 @@ public class CarouelController {
         }
 
     }
+
+     */
 
     /**
      * This method shoot the ball in position 0 .
@@ -487,6 +493,8 @@ public class CarouelController {
         }
     }
 
+    /*
+
     public void shootGreen() {
         if (configReadNeeded) {
             readBallConfiguration();
@@ -515,6 +523,9 @@ public class CarouelController {
         //Log.d("9010", ballConfiguration[0] + " " + ballConfiguration[1] + " " + ballConfiguration[2]);
     }
 
+     */
+
+    /*
     public void shootPurple() {
         if (configReadNeeded) {
             readBallConfiguration();
@@ -541,4 +552,6 @@ public class CarouelController {
         }
         shootBall();
     }
+
+     */
 }
