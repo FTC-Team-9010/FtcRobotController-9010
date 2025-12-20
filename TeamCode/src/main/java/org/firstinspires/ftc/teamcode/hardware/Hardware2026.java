@@ -182,7 +182,7 @@ public class Hardware2026 {
         odo = hwMap.get(GoBildaPinpointDriver.class, "odo");
 
         //X pod is 4 inch on the right of center,  Y pod is 2 inch behind the center.
-        odo.setOffsets(-101, -52);
+        odo.setOffsets(-101, 25);
 
         /*
         Set the kind of pods used by your robot. If you're using goBILDA odometry pods, select either

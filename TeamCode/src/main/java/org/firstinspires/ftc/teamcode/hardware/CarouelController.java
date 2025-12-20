@@ -178,6 +178,8 @@ public class CarouelController {
      * Using the magetic senstor to move the carouel to init position.
      * Then reset encoder to 0 on the motor.
      */
+
+    /*
     public void initPosition() {
 
         int currentPosition = carouel.getCurrentPosition();
@@ -195,7 +197,7 @@ public class CarouelController {
         }
         carouel.setVelocity(0);
 
-        /*
+
         try {
             Thread.sleep(500);
         } catch (Exception ex) {
@@ -210,7 +212,7 @@ public class CarouelController {
             Log.d("9010","Position with MagLimit backward: " + currentPosition);
         }
         carouel.setVelocity(0);
-          */
+
         currentPosition = carouel.getCurrentPosition();
         Log.d("9010", "Position after stop: " + currentPosition);
 
@@ -221,6 +223,8 @@ public class CarouelController {
         carouel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
     }
+
+    */
 
     public void alignIntake() {
         intakeMode = true;
@@ -245,6 +249,8 @@ public class CarouelController {
     /**
      * Rotate clock wise for 120 degrees.
      */
+
+    
     public void rotateOneSlotCW() {
 
         int startPosition = carouel.getCurrentPosition();

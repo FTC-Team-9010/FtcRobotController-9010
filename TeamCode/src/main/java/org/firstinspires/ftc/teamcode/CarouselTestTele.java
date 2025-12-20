@@ -30,7 +30,7 @@ public class CarouselTestTele extends LinearOpMode {
         while (opModeIsActive()) {
 
             if (gamepad1.back) {
-                car.initPosition();
+                //      q1car.initPosition();
             } else if ( gamepad1.dpad_left) {
                 car.setTurnKP(pidCoffs[0]);
                 car.setTurnKI(pidCoffs[1]);
@@ -95,26 +95,26 @@ public class CarouselTestTele extends LinearOpMode {
 
             if (gamepad1.dpad_up) {
                 int greenIndex = hardware.readGreenIndex();
-                car.readBallConfiguration();
+                //car.readBallConfiguration();
                 car.matchConfigToSequence( greenIndex );
 
             }
 
             if (gamepad1.dpad_down) {
                 int greenIndex = hardware.readGreenIndex();
-                car.shootPattern(greenIndex);
+                //car.shootPattern(greenIndex);
             }
 
             if (gamepad1.left_stick_button) {
-                car.shootPurple();
+                //car.shootPurple();
             }
 
             if (gamepad1.right_stick_button) {
-                car.shootGreen();
+                //car.shootGreen();
             }
 
             if (gamepad1.start) {
-                car.readBallConfiguration();
+                //car.readBallConfiguration();
             }
 
         }

@@ -32,7 +32,7 @@ public class GeneralDriver2026 extends LinearOpMode {
 
         telemetry.addData("[>]", "All set?");
         telemetry.update();
-        car.initPosition();
+        //car.initPosition();
 
         waitForStart();
         telemetry.clearAll();
@@ -80,29 +80,40 @@ public class GeneralDriver2026 extends LinearOpMode {
             }
 
             if (gamepad1.back) {
-                car.initPosition();
+                //car.initPosition();
             }
 
             if (currentGamePad1.a) {
-                car.rotateOneSlotCCW();
+                if ( hdw.getIntakePower()!=0 ) {
+                    hdw.setIntakePower(0);
+                } else {
+                    hdw.setIntakePower(-1 * hdw.INTAKE_POWER);
+                    //car.alignIntake();
+                }
             }
 
-            if (currentGamePad1.b) {
-                car.rotateOneSlotCW();
+            if (currentGamePad1.b && ! previousGamePad1.b) {
+                if (robotWheel.isHeadingForward()) {
+                    robotWheel.setHeadingForward(false);
+
+                } else {
+                    robotWheel.setHeadingForward(true);
+
+                }
             }
 
             if (currentGamePad1.dpad_down) {
-                //car.alignShoot();
+                car.shootBall();
 
             }
             if (currentGamePad1.dpad_up) {
                 //car.alignIntake();
             }
             if ( currentGamePad1.dpad_left){
-                car.shootBall();
+                //car.rotateOneSlotCCW();
             }
             if (currentGamePad1.dpad_right) {
-                hdw.moveByAprilTag(20,1000,0 );
+                //car.rotateOneSlotCW();
             }
 
             if ( currentGamePad1.left_bumper){
@@ -112,6 +123,9 @@ public class GeneralDriver2026 extends LinearOpMode {
                 sleep(100);
             }
             if (currentGamePad1.right_bumper) {
+                if (car.presetLaunchPower <= 0) {
+                    car.presetLaunchPower = 0;
+                }
                 car.presetLaunchPower -= .1;
                 telemetry.addData("Current Launcher Power (0-1): ",car.presetLaunchPower);
                 telemetry.update();
