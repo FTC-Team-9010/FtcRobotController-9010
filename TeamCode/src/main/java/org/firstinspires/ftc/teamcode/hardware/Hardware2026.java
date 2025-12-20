@@ -45,14 +45,14 @@ public class Hardware2026 {
     GoBildaPinpointDriver odo;
 
     //TODO: Recalibrate these PID values for the next robot
-    double turnKP = 15;
-    double turnKI = 1;
-    double turnKD = 0.5;
+    double turnKP = 60;
+    double turnKI = 0.4;
+    double turnKD = 5;
     double turnKF = 0.0;
 
-     double lnKP = 12;
-     double lnKI = 1;
-     double lnKD = 2.6;
+     double lnKP = 15;
+     double lnKI = 0.3;
+     double lnKD = 3;
      double lnKF = 0.0;
 
     private double moveTimeOut = 5000;
@@ -181,8 +181,8 @@ public class Hardware2026 {
         //init GoBuilda Odameter
         odo = hwMap.get(GoBildaPinpointDriver.class, "odo");
 
-        //X pod is 4 inch on the right of center,  Y pod is 2 inch behind the center.
-        odo.setOffsets(-101, 25);
+        //X pod is 8 inch on the right of center,  Y pod is 0 inch behind the center.
+        odo.setOffsets(-203, 0);
 
         /*
         Set the kind of pods used by your robot. If you're using goBILDA odometry pods, select either
@@ -195,7 +195,7 @@ public class Hardware2026 {
         /*
           Please refer to Go Builder Example.
          */
-        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD,GoBildaPinpointDriver.EncoderDirection.REVERSED);
+        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.REVERSED,GoBildaPinpointDriver.EncoderDirection.REVERSED);
 
         /*
         Before running the robot, recalibrate the IMU. This needs to happen when the robot is stationary

@@ -30,10 +30,6 @@ public class GeneralDriver2026 extends LinearOpMode {
         hdw.createHardware();
         robotWheel = new MecanumWheels2023();
 
-        anchorRunnable = new AnchorRunnable(hdw,this);
-        Thread armThread = new Thread(anchorRunnable);
-        armThread.start();
-        Log.d("9010", "new thread running");
 
         double turbo = 1;
 
@@ -47,6 +43,12 @@ public class GeneralDriver2026 extends LinearOpMode {
         Gamepad previousGamePad1 = new Gamepad();
 
         currentGamePad1.copy(gamepad1);
+
+        anchorRunnable = new AnchorRunnable(hdw,this);
+        Thread anchorThread = new Thread(anchorRunnable);
+        anchorThread.start();
+        Log.d("9010", "new thread running");
+
         while (opModeIsActive()) {
 
             //Record previous Gamepad Status
@@ -94,14 +96,6 @@ public class GeneralDriver2026 extends LinearOpMode {
             }
 
             if (currentGamePad1.b && ! previousGamePad1.b) {
-                if (robotWheel.isHeadingForward()) {
-                    robotWheel.setHeadingForward(false);
-                } else {
-                    robotWheel.setHeadingForward(true);
-                }
-            }
-
-            if (currentGamePad1.x && ! previousGamePad1.x) {
                 if (anchorRunnable.isRunning()) {
                     anchorRunnable.setRunning(false);
                 } else {
@@ -109,7 +103,9 @@ public class GeneralDriver2026 extends LinearOpMode {
                 }
                 telemetry.addLine().addData("Anchor running: ",anchorRunnable.isRunning());
                 telemetry.update();
+
             }
+
 
             if (currentGamePad1.dpad_down) {
                 car.shootBall();

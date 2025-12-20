@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.hardware.Hardware2026;
 public class HWTestTele  extends LinearOpMode {
     Hardware2026 hdw;
 
-    double[] pidCoffs = { 12,1,2.6 };
+    double[] pidCoffs = { 15,0.3,3 };
     int pidCoffIndex = 0;
 
     @Override
@@ -42,16 +42,16 @@ public class HWTestTele  extends LinearOpMode {
             currentGamePad1.copy(gamepad1);
 
             if (gamepad1.dpad_left) {
-                hdw.setLnKP(pidCoffs[0]);
-                hdw.setLnKI(pidCoffs[1]);
-                hdw.setLnKD(pidCoffs[2]);
-                hdw.moveToXYPosition(0, 200, 0 );
+                hdw.setTurnKP(pidCoffs[0]);
+                hdw.setTurnKI(pidCoffs[1]);
+                hdw.setTurnKD(pidCoffs[2]);
+                hdw.moveToXYPosition(0, 0, 10 );
             }
             if (gamepad1.dpad_right) {
-                hdw.setLnKP(pidCoffs[0]);
-                hdw.setLnKI(pidCoffs[1]);
-                hdw.setLnKD(pidCoffs[2]);
-                hdw.moveToXYPosition(0,  -200 ,  0);
+                hdw.setTurnKP(pidCoffs[0]);
+                hdw.setTurnKI(pidCoffs[1]);
+                hdw.setTurnKD(pidCoffs[2]);
+                hdw.moveToXYPosition(0,  0 ,  -90);
             }
             if (gamepad1.dpad_up) {
                 telemetry.addLine().addData("[moving y >]  ", " Y ");
@@ -59,15 +59,18 @@ public class HWTestTele  extends LinearOpMode {
                 hdw.setLnKP(pidCoffs[0]);
                 hdw.setLnKI(pidCoffs[1]);
                 hdw.setLnKD(pidCoffs[2]);
-                hdw.moveByAprilTag(20,1500,0);
-
+                //hdw.moveByAprilTag(20,1500,0);
+                hdw.moveToXYPosition(200,  0 ,  0);
             }
+
             if (gamepad1.dpad_down) {
                 hdw.setLnKP(pidCoffs[0]);
                 hdw.setLnKI(pidCoffs[1]);
                 hdw.setLnKD(pidCoffs[2]);
-                hdw.moveByAprilTag(20, 1000, 0);
+                //hdw.moveByAprilTag(20, 1000, 0);
+                hdw.moveToXYPosition(-1000,  0 ,  0);
             }
+
 
             if( gamepad1.x) {
                 pidCoffIndex = 0;

@@ -32,7 +32,8 @@ public class AnchorRunnable implements  Runnable{
     @Override
     public void run() {
         while (opMode.opModeIsActive()) {
-            while (isRunning()) {
+            Log.d("9010","Into Thread");
+            while (this.running) {
                 hdw.wheelFrontLeft.setVelocity(0);
                 hdw.wheelBackLeft.setVelocity(0);
                 hdw.wheelFrontRight.setVelocity(0);
@@ -54,9 +55,9 @@ public class AnchorRunnable implements  Runnable{
                 Pose2D currentPos = null;
 
                 //Before start, get init position and heading
-                double currenXPosition = initPos.getX(DistanceUnit.MM);
+                double initPosX = initPos.getX(DistanceUnit.MM);
 
-                double currenYPosition = initPos.getY(DistanceUnit.MM);
+                double initPosY = initPos.getY(DistanceUnit.MM);
 
                 double startHeading = initPos.getHeading(AngleUnit.DEGREES);
 
@@ -70,17 +71,17 @@ public class AnchorRunnable implements  Runnable{
                 //Log.d("9010", "turnKp: " + turnKP + "  lnKI: " + turnKI + " turnKD: " + turnKD);
 
                 lnYPidfCrtler.setSetPoint(0);
-                lnYPidfCrtler.setTolerance(10);
+                lnYPidfCrtler.setTolerance(5);
                 //set Integration to avoid saturating PID output.
                 lnYPidfCrtler.setIntegrationBounds(-1000, 1000);
 
                 lnXPidfCrtler.setSetPoint(0);
-                lnXPidfCrtler.setTolerance(10);
+                lnXPidfCrtler.setTolerance(5);
                 lnXPidfCrtler.setIntegrationBounds(-1000, 1000);
 
                 turnPidfCrtler.setSetPoint(0);
                 //Set tolerance as 0.5 degrees
-                turnPidfCrtler.setTolerance(1);
+                turnPidfCrtler.setTolerance(0.2);
                 turnPidfCrtler.setIntegrationBounds(-1, 1);
 
                 while (running) {
@@ -101,8 +102,8 @@ public class AnchorRunnable implements  Runnable{
                     //        + " Heading: " + currentPos.getHeading(AngleUnit.DEGREES) );
 
                     //Reverse X and Y, Gobuilda PinPoint odo meter has X on Foward, and Y on Strafe
-                    double velocityXCaculated = lnYPidfCrtler.calculate(currenYPosition - currentPos.getY(DistanceUnit.MM));
-                    double velocityYCaculated = lnXPidfCrtler.calculate(currenXPosition - currentPos.getX(DistanceUnit.MM));
+                    double velocityXCaculated = lnYPidfCrtler.calculate(initPosY - currentPos.getY(DistanceUnit.MM));
+                    double velocityYCaculated = lnXPidfCrtler.calculate(initPosX - currentPos.getX(DistanceUnit.MM));
                     double rx = -turnPidfCrtler.calculate(startHeading - currentPos.getHeading(AngleUnit.DEGREES));
 
                     //Log.d("9010", "Error X: " + (targetXPosition - currentPos.getX(DistanceUnit.MM) ) );
