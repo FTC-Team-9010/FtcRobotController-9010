@@ -1,9 +1,13 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
+import org.firstinspires.ftc.teamcode.hardware.AnchorRunnable;
+import org.firstinspires.ftc.teamcode.hardware.ArmControlRunable;
 import org.firstinspires.ftc.teamcode.hardware.CarouelController;
 import org.firstinspires.ftc.teamcode.hardware.Hardware2026;
 import org.firstinspires.ftc.teamcode.hardware.MecanumWheels2023;
@@ -15,6 +19,7 @@ public class GeneralDriver2026 extends LinearOpMode {
 
     MecanumWheels2023 robotWheel;
     CarouelController car;
+    AnchorRunnable anchorRunnable = null;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -24,6 +29,11 @@ public class GeneralDriver2026 extends LinearOpMode {
         hdw = new Hardware2026(hardwareMap, telemetry); //init hardware
         hdw.createHardware();
         robotWheel = new MecanumWheels2023();
+
+        anchorRunnable = new AnchorRunnable(hdw,this);
+        Thread armThread = new Thread(anchorRunnable);
+        armThread.start();
+        Log.d("9010", "new thread running");
 
         double turbo = 1;
 
@@ -86,11 +96,19 @@ public class GeneralDriver2026 extends LinearOpMode {
             if (currentGamePad1.b && ! previousGamePad1.b) {
                 if (robotWheel.isHeadingForward()) {
                     robotWheel.setHeadingForward(false);
-
                 } else {
                     robotWheel.setHeadingForward(true);
-
                 }
+            }
+
+            if (currentGamePad1.x && ! previousGamePad1.x) {
+                if (anchorRunnable.isRunning()) {
+                    anchorRunnable.setRunning(false);
+                } else {
+                    anchorRunnable.setRunning(true);
+                }
+                telemetry.addLine().addData("Anchor running: ",anchorRunnable.isRunning());
+                telemetry.update();
             }
 
             if (currentGamePad1.dpad_down) {
