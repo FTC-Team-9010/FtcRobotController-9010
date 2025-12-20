@@ -45,15 +45,15 @@ public class Hardware2026 {
     GoBildaPinpointDriver odo;
 
     //TODO: Recalibrate these PID values for the next robot
-    private double turnKP = 15;
-    private double turnKI = 1;
-    private double turnKD = 0.5;
-    private double turnKF = 0.0;
+    double turnKP = 15;
+    double turnKI = 1;
+    double turnKD = 0.5;
+    double turnKF = 0.0;
 
-    private double lnKP = 12;
-    private double lnKI = 1;
-    private double lnKD = 2.6;
-    private double lnKF = 0.0;
+     double lnKP = 12;
+     double lnKI = 1;
+     double lnKD = 2.6;
+     double lnKF = 0.0;
 
     private double moveTimeOut = 5000;
 

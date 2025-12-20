@@ -1,14 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.util.Log;
-
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.hardware.CarouelController;
 import org.firstinspires.ftc.teamcode.hardware.Hardware2026;
-import org.firstinspires.ftc.teamcode.hardware.MecanumWheels2022;
 import org.firstinspires.ftc.teamcode.hardware.MecanumWheels2023;
 
 @TeleOp(name="GeneralDriver2026", group="TeleOps")
@@ -21,9 +18,9 @@ public class GeneralDriver2026 extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+        //Don't initialize carousel position.  Make sure it's aligned
         car = new CarouelController(hardwareMap, telemetry);
         car.initialize();
-
         hdw = new Hardware2026(hardwareMap, telemetry); //init hardware
         hdw.createHardware();
         robotWheel = new MecanumWheels2023();
@@ -32,7 +29,6 @@ public class GeneralDriver2026 extends LinearOpMode {
 
         telemetry.addData("[>]", "All set?");
         telemetry.update();
-        //car.initPosition();
 
         waitForStart();
         telemetry.clearAll();
@@ -50,9 +46,8 @@ public class GeneralDriver2026 extends LinearOpMode {
 
             robotWheel.joystick(gamepad1, turbo);
 
-            Log.d("9010", "lfWheel Power:" + robotWheel.wheelFrontLeftPower);
-            Log.d("9010", "lrWheel Power:" + robotWheel.wheelFrontRightPower);
-
+            //Log.d("9010", "lfWheel Power:" + robotWheel.wheelFrontLeftPower);
+            //Log.d("9010", "lrWheel Power:" + robotWheel.wheelFrontRightPower);
             //Log.d("9010", "lfWheel Velocity:" + robotWheel.wheelFrontLeftPower*Hardware2026.ANGULAR_RATE);
 
             hdw.wheelFrontLeft.setVelocity(robotWheel.wheelFrontLeftPower * Hardware2026.ANGULAR_RATE);
@@ -60,13 +55,11 @@ public class GeneralDriver2026 extends LinearOpMode {
             hdw.wheelFrontRight.setVelocity(robotWheel.wheelFrontRightPower * Hardware2026.ANGULAR_RATE);
             hdw.wheelBackRight.setVelocity(robotWheel.wheelBackRightPower * Hardware2026.ANGULAR_RATE);
 
-
             if (!previousGamePad1.x && currentGamePad1.x) {
                 if ( hdw.getIntakePower()!=0 ) {
                     hdw.setIntakePower(0);
                 } else {
                     hdw.setIntakePower(hdw.INTAKE_POWER);
-                    //car.alignIntake();
                 }
             }
 
@@ -75,12 +68,11 @@ public class GeneralDriver2026 extends LinearOpMode {
                     car.setLauncherPower(0);
                 } else {
                     car.setLauncherPower(car.presetLaunchPower);
-                    //car.alignShoot();
                 }
             }
 
             if (gamepad1.back) {
-                //car.initPosition();
+                car.initPosition();
             }
 
             if (currentGamePad1.a) {
@@ -88,7 +80,6 @@ public class GeneralDriver2026 extends LinearOpMode {
                     hdw.setIntakePower(0);
                 } else {
                     hdw.setIntakePower(-1 * hdw.INTAKE_POWER);
-                    //car.alignIntake();
                 }
             }
 
@@ -107,13 +98,13 @@ public class GeneralDriver2026 extends LinearOpMode {
 
             }
             if (currentGamePad1.dpad_up) {
-                //car.alignIntake();
+
             }
             if ( currentGamePad1.dpad_left){
-                //car.rotateOneSlotCCW();
+                car.rotateOneSlotCCW();
             }
             if (currentGamePad1.dpad_right) {
-                //car.rotateOneSlotCW();
+                car.rotateOneSlotCW();
             }
 
             if ( currentGamePad1.left_bumper){
@@ -130,7 +121,6 @@ public class GeneralDriver2026 extends LinearOpMode {
                 telemetry.addData("Current Launcher Power (0-1): ",car.presetLaunchPower);
                 telemetry.update();
                 sleep(100);
-
             }
 
         }

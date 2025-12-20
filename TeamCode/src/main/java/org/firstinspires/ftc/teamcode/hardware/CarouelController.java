@@ -159,6 +159,7 @@ public class CarouelController {
 
         //Initialize the motor.
         carouel = hardwareMap.get(DcMotorEx.class, "carousel");
+        carouel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         carouel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         carouel.setVelocity(0);
 
@@ -171,7 +172,6 @@ public class CarouelController {
 
         lanchLever = hardwareMap.get(Servo.class,"launchLever");
         lanchLever.setPosition(leverLowPosition);
-
     }
 
     /**
@@ -179,7 +179,7 @@ public class CarouelController {
      * Then reset encoder to 0 on the motor.
      */
 
-    /*
+
     public void initPosition() {
 
         int currentPosition = carouel.getCurrentPosition();
@@ -223,8 +223,6 @@ public class CarouelController {
         carouel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
     }
-
-    */
 
     public void alignIntake() {
         intakeMode = true;
@@ -377,7 +375,7 @@ public class CarouelController {
      * Read all 3 colors into the ball configuration.
      * after reading, set confReadNeeded flag to false;
      */
-    /*
+
     public void readBallConfiguration() {
         for (int i = 0; i < 3; i++) {
             float color = this.getHsv(i);
@@ -400,7 +398,7 @@ public class CarouelController {
         }
     }
 
-     */
+
 
     /**
      * match the ball configuration to the sequence, by rotating the carouel.
@@ -448,7 +446,7 @@ public class CarouelController {
      * This method will call read Ball COnfiguration, and then match configToSequence.
      * THen,  lunch Ball in detected sequence.
      */
-    /*
+
     public void shootPattern(int decodedGreenIndex) {
         if ( configReadNeeded ) {
             readBallConfiguration();
@@ -466,7 +464,7 @@ public class CarouelController {
 
     }
 
-     */
+
 
     /**
      * This method shoot the ball in position 0 .
@@ -499,7 +497,7 @@ public class CarouelController {
         }
     }
 
-    /*
+
 
     public void shootGreen() {
         if (configReadNeeded) {
@@ -529,9 +527,6 @@ public class CarouelController {
         //Log.d("9010", ballConfiguration[0] + " " + ballConfiguration[1] + " " + ballConfiguration[2]);
     }
 
-     */
-
-    /*
     public void shootPurple() {
         if (configReadNeeded) {
             readBallConfiguration();
@@ -559,5 +554,4 @@ public class CarouelController {
         shootBall();
     }
 
-     */
 }
