@@ -144,13 +144,9 @@ public class Hardware2026 {
 
     public void createHardware() {
         //Initialize LimeLite
-
-        /* Comment out for drive testing
         limelight = hwMap.get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(0);
         limelight.start();
-        
-         */
 
         wheelFrontRight = hwMap.get(DcMotorEx.class,"rfWheel");
         wheelFrontLeft = hwMap.get(DcMotorEx.class, "lfWheel");
@@ -231,23 +227,21 @@ public class Hardware2026 {
 
 
     /**
-     * Move Robot according to the position of the April Tag.  Robot suppose to be square with the
-     * april tag
+     * Move Robot according to the position of the April Tag.  Robot shall center itself to the tag
+     * for the shooting, and move to the correct shooting distance.
      *
      * @param tagId    Id of the tag to be used for reference.
      * @param targetY   distance of robot to the april tag,  unit in mm.
-     * @param targetX   horizontal shift to the center of april tag.  unit in mm.  Positive
-     *                  means tag is on the right of robot camera.
      */
-    public void moveByAprilTag( int tagId,  double targetY  ,  double targetX  ) throws InterruptedException {
-        //TODO: Recauculate this.
+    public void moveByAprilTag( int tagId,  double targetY  ) throws InterruptedException {
+
         //Yaw difference between camera and robot front line.
         double yawOffset = 0;
         //Center of robot to the camera,
         double cameraRadius = 6.875 ;
 
         Log.d("9010", "in MoveByApril Tag, Target Tag is: "  + tagId
-         + " Target X: " + targetX +  " Target Y: " + targetY);
+         +   " Target Y: " + targetY);
 
         //Start April Tag detection fo find tag, possible multiple tag in camera frame,
         //So result is a list.
@@ -258,22 +252,19 @@ public class Hardware2026 {
             for (LLResultTypes.FiducialResult fr : fiducialResults) {
                     if ( fr.getFiducialId() == tagId) {
                         //Here we found our target April Tag.
-                        double yawToTag  = fr.getTargetPoseCameraSpace().getOrientation().getPitch();
                         double yToTag = fr.getTargetPoseCameraSpace().getPosition().z*1000;
                         double xToTag = fr.getTargetPoseCameraSpace().getPosition().y*1000;
                         double rangeToTag = Math.sqrt( Math.pow(xToTag, 2) + Math.pow(yToTag, 2));
 
-                        Log.d("9010", " Yaw: " + yawToTag + " Range:  " + rangeToTag);
-                        Log.d( "9010", " x to Tag: " + xToTag +  " Y to Tag: " + yToTag);
-                        double alpha = 90 - result.getTx() + yawToTag;
+                        //Offset of camera to tag
+                        double tx =  result.getTx();
+                        Log.d("9010","Range is : " + rangeToTag + " Tx: " + tx );
 
-                        double newX= rangeToTag * Math.cos( Math.toRadians( alpha)  );
-                        double newY = rangeToTag * Math.sin(Math.toRadians(alpha));
+                        //center the robot.
+                        this.moveToXYPosition(0,0,-tx);
 
-                        Log.d("9010","nX ToTag: " + newX + "nY to Tag: " + newY + " alpha to Tag: " + alpha);
-                        //Move by odometer. Note that go BUilder Odo
                         // X is forward/backward.
-                        this.moveToXYPosition(newY - targetY, targetX-newX, -yawToTag);
+                        this.moveToXYPosition(targetY- rangeToTag, 0, 0);
                     }
                 }
 
@@ -349,7 +340,7 @@ public class Hardware2026 {
 
         turnPidfCrtler.setSetPoint(0);
         //Set tolerance as 0.5 degrees
-        turnPidfCrtler.setTolerance(1.5);
+        turnPidfCrtler.setTolerance(0.5);
         turnPidfCrtler.setIntegrationBounds(-1, 1);
 
         //Log.d("9010", "Before entering Loop ");
