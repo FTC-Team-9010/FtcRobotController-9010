@@ -258,13 +258,12 @@ public class Hardware2026 {
 
                         //Offset of camera to tag
                         double tx =  result.getTx();
-                        Log.d("9010","Range is : " + rangeToTag + " Tx: " + tx );
-
+                        double deltaX = Math.cos(Math.toRadians(tx)) * (targetY - rangeToTag);
+                        double deltaY = Math.sin(Math.toRadians(-tx)) *(targetY - rangeToTag);
+                        Log.d("9010","Range is : " + rangeToTag + " Tx: " + tx
+                                + " DeltaX: " + deltaX + " DeltaY: " + deltaY);
                         //center the robot.
-                        this.moveToXYPosition(0,0,-tx);
-
-                        // X is forward/backward.
-                        this.moveToXYPosition(targetY- rangeToTag, 0, 0);
+                        this.moveToXYPosition(deltaX,deltaY,-tx);
                     }
                 }
 

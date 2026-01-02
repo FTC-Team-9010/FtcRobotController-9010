@@ -32,8 +32,8 @@ public class AnchorRunnable implements  Runnable{
     @Override
     public void run() {
         while (opMode.opModeIsActive()) {
-            Log.d("9010","Into Thread");
             while (this.running) {
+                Log.d("9010","Running Anchor");
                 hdw.wheelFrontLeft.setVelocity(0);
                 hdw.wheelBackLeft.setVelocity(0);
                 hdw.wheelFrontRight.setVelocity(0);

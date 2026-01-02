@@ -12,8 +12,8 @@ import org.firstinspires.ftc.teamcode.hardware.CarouelController;
 import org.firstinspires.ftc.teamcode.hardware.Hardware2026;
 import org.firstinspires.ftc.teamcode.hardware.MecanumWheels2023;
 
-@TeleOp(name="GeneralDriver2026", group="TeleOps")
-public class GeneralDriver2026 extends LinearOpMode {
+public abstract class GeneralDriver2026 extends LinearOpMode {
+    int targetTagId = 0;
 
     Hardware2026 hdw;
 
@@ -103,17 +103,16 @@ public class GeneralDriver2026 extends LinearOpMode {
                 }
                 telemetry.addLine().addData("Anchor running: ",anchorRunnable.isRunning());
                 telemetry.update();
-
             }
-
 
             if (currentGamePad1.dpad_down) {
                 car.shootBall();
-
             }
+
             if (currentGamePad1.dpad_up) {
-
+                hdw.moveByAprilTag(this.targetTagId, 2000);
             }
+
             if ( currentGamePad1.dpad_left){
                 car.rotateOneSlotCCW();
             }
@@ -136,7 +135,6 @@ public class GeneralDriver2026 extends LinearOpMode {
                 telemetry.update();
                 sleep(100);
             }
-
         }
 
     }
