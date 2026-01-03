@@ -33,6 +33,8 @@ public class PracticeDriver extends LinearOpMode {
 
         currentGamePad1.copy(gamepad1);
 
+        hdw.armInit();
+
         //This is the main loop of operation.
         while (opModeIsActive()) {
 
@@ -48,16 +50,27 @@ public class PracticeDriver extends LinearOpMode {
             hdw.wheelFrontRight.setVelocity(robotWheel.wheelFrontRightPower * HardwarePractice.ANGULAR_RATE);
             hdw.wheelBackRight.setVelocity(robotWheel.wheelBackRightPower * HardwarePractice.ANGULAR_RATE);
 
-            if (!previousGamePad1.a && currentGamePad1.a) {
-                if ( hdw.getLauncherPower()!=0 ) {
-                    hdw.launcherOff();
+            if (!previousGamePad1.y && currentGamePad1.y) {
+                if (hdw.getLauncherPower() != 0) {
+                    hdw.setLauncherPower(0);
+                    hdw.setFlywheelPower(0);
                 } else {
-                    hdw.launcherOn();
+                    hdw.setLauncherPower(hdw.practicePresetLaunchPower);
+                    hdw.setFlywheelPower(hdw.practiceFlywheelPower);
                 }
             }
+
+            if (!previousGamePad1.x && currentGamePad1.x) {
+                hdw.armLaunch();
+            }
+
+            if (previousGamePad1.x && !currentGamePad1.x) {
+
+                hdw.armInit();
+            }
+
 
         }
 
     }
-
 }
