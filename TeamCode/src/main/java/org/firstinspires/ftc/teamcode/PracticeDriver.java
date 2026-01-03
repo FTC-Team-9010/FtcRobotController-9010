@@ -50,9 +50,9 @@ public class PracticeDriver extends LinearOpMode {
 
             if (!previousGamePad1.a && currentGamePad1.a) {
                 if ( hdw.getLauncherPower()!=0 ) {
-                    hdw.launcherOff();
+                    hdw.setLauncherPower(0);
                 } else {
-                    hdw.launcherOn();
+                    hdw.setLauncherPower(hdw.launcherPower);
                 }
             }
 

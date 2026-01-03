@@ -12,6 +12,7 @@ public class HardwarePractice {
     public HardwareMap hwMap;
 
     public Telemetry telemetry;
+    public float launcherPower;
 
     public HardwarePractice(HardwareMap m, Telemetry tm) {
         hwMap = m;
@@ -20,8 +21,6 @@ public class HardwarePractice {
 
     static public double ANGULAR_RATE = 2500.0;
     private final double MIN_VELOCITY = 0.1;
-
-    private float launcherPower = 1;
 
     public DcMotorEx wheelFrontRight = null;
     public DcMotorEx wheelFrontLeft = null;
@@ -70,5 +69,10 @@ public class HardwarePractice {
 
     public float getLauncherPower() {
         return launcherPower;
+    }
+
+    public void setLauncherPower(float power) {
+        launcherPower = power;
+        launcher.setPower(power);
     }
 }
