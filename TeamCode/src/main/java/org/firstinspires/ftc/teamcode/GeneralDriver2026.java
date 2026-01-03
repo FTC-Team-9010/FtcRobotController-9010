@@ -21,6 +21,8 @@ public abstract class GeneralDriver2026 extends LinearOpMode {
     CarouelController car;
     AnchorRunnable anchorRunnable = null;
 
+    float autoLaunchPower = 0;
+
     @Override
     public void runOpMode() throws InterruptedException {
         //Don't initialize carousel position.  Make sure it's aligned
@@ -29,7 +31,6 @@ public abstract class GeneralDriver2026 extends LinearOpMode {
         hdw = new Hardware2026(hardwareMap, telemetry); //init hardware
         hdw.createHardware();
         robotWheel = new MecanumWheels2023();
-
 
         double turbo = 1;
 
@@ -58,34 +59,32 @@ public abstract class GeneralDriver2026 extends LinearOpMode {
 
             robotWheel.joystick(gamepad1, turbo);
 
-            //Log.d("9010", "lfWheel Power:" + robotWheel.wheelFrontLeftPower);
-            //Log.d("9010", "lrWheel Power:" + robotWheel.wheelFrontRightPower);
-            //Log.d("9010", "lfWheel Velocity:" + robotWheel.wheelFrontLeftPower*Hardware2026.ANGULAR_RATE);
-
             hdw.wheelFrontLeft.setVelocity(robotWheel.wheelFrontLeftPower * Hardware2026.ANGULAR_RATE);
             hdw.wheelBackLeft.setVelocity(robotWheel.wheelBackLeftPower * Hardware2026.ANGULAR_RATE);
             hdw.wheelFrontRight.setVelocity(robotWheel.wheelFrontRightPower * Hardware2026.ANGULAR_RATE);
             hdw.wheelBackRight.setVelocity(robotWheel.wheelBackRightPower * Hardware2026.ANGULAR_RATE);
 
-            if (!previousGamePad1.x && currentGamePad1.x) {
-                if ( hdw.getIntakePower()!=0 ) {
-                    hdw.setIntakePower(0);
-                } else {
-                    hdw.setIntakePower(hdw.INTAKE_POWER);
-                }
-            }
-
-            if (!previousGamePad1.y && currentGamePad1.y) {
-                if ( car.getLauncherPower()!=0 ) {
-                    car.setLauncherPower(0);
-                } else {
-                    car.setLauncherPower(car.presetLaunchPower);
-                }
+            hdw.setIntakePower(currentGamePad1.left_trigger);
+            if ( autoLaunchPower==0 ) {
+                car.setLauncherPower(currentGamePad1.right_trigger * (float) 0.95);
             }
 
             if (gamepad1.back) {
                 car.initPosition();
             }
+            if (!previousGamePad1.ps && currentGamePad1.ps) {
+                robotWheel.setHeadingForward(!robotWheel.isHeadingForward());
+                telemetry.addLine().addData("Heading Foward: ", robotWheel.isHeadingForward());
+                telemetry.update();
+            }
+
+            if (!previousGamePad1.x && currentGamePad1.x) {
+
+            }
+
+            if (!previousGamePad1.y && currentGamePad1.y) {
+            }
+
 
             if (currentGamePad1.a) {
                 if ( hdw.getIntakePower()!=0 ) {
@@ -105,12 +104,16 @@ public abstract class GeneralDriver2026 extends LinearOpMode {
                 telemetry.update();
             }
 
-            if (currentGamePad1.dpad_down) {
-                car.shootBall();
+            if (!previousGamePad1.right_stick_button && currentGamePad1.right_stick_button) {
+                autoLaunchPower = (float) 0.95;
+                car.setLauncherPower(autoLaunchPower);
+                hdw.moveByAprilTag(this.targetTagId, 1900);
             }
 
-            if (currentGamePad1.dpad_up) {
-                hdw.moveByAprilTag(this.targetTagId, 2000);
+            if (!previousGamePad1.left_stick_button && currentGamePad1.left_stick_button) {
+                car.shootBall();
+                sleep(500);
+                autoLaunchPower = 0;
             }
 
             if ( currentGamePad1.dpad_left){
@@ -121,19 +124,10 @@ public abstract class GeneralDriver2026 extends LinearOpMode {
             }
 
             if ( currentGamePad1.left_bumper){
-                car.presetLaunchPower += .1;
-                telemetry.addData("Current Launcher Power (0-1): ",car.presetLaunchPower);
-                telemetry.update();
-                sleep(100);
+                //Shooting green ball
             }
             if (currentGamePad1.right_bumper) {
-                if (car.presetLaunchPower <= 0) {
-                    car.presetLaunchPower = 0;
-                }
-                car.presetLaunchPower -= .1;
-                telemetry.addData("Current Launcher Power (0-1): ",car.presetLaunchPower);
-                telemetry.update();
-                sleep(100);
+                //Shooting purple ball
             }
         }
 
