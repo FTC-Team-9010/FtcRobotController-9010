@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.hardware.MecanumWheels2023;
 
 public abstract class GeneralDriver2026 extends LinearOpMode {
     int targetTagId = 0;
+    int greenIndex = 0;
 
     Hardware2026 hdw;
 
@@ -116,19 +117,46 @@ public abstract class GeneralDriver2026 extends LinearOpMode {
                 autoLaunchPower = 0;
             }
 
-            if ( currentGamePad1.dpad_left){
+            if (!previousGamePad1.dpad_left && currentGamePad1.dpad_left){
                 car.rotateOneSlotCCW();
             }
-            if (currentGamePad1.dpad_right) {
+            if (!previousGamePad1.dpad_right && currentGamePad1.dpad_right) {
                 car.rotateOneSlotCW();
             }
+            if (!previousGamePad1.dpad_up && currentGamePad1.dpad_up) {
+                car.readBallConfiguration();
+            }
+            if (!previousGamePad1.dpad_down && currentGamePad1.dpad_down) {
+                car.shootPattern(greenIndex);
+                sleep(500);
+                autoLaunchPower = 0;
+            }
 
-            if ( currentGamePad1.left_bumper){
+            if (!previousGamePad1.left_bumper && currentGamePad1.left_bumper){
                 //Shooting green ball
+                car.shootGreen();
             }
-            if (currentGamePad1.right_bumper) {
+            if (!previousGamePad1.right_bumper && currentGamePad1.right_bumper) {
                 //Shooting purple ball
+                car.shootPurple();
             }
+
+            if( gamepad2.y) {
+                greenIndex = 0;
+                telemetry.addLine().addData("Pattern : G P P",anchorRunnable.isRunning());
+                telemetry.update();
+            }
+            if ( gamepad2.b) {
+                greenIndex= 1;
+                telemetry.addLine().addData("Pattern : P G P",anchorRunnable.isRunning());
+                telemetry.update();
+            }
+            if ( gamepad2.a) {
+                greenIndex = 2;
+                telemetry.addLine().addData("Pattern : P P G",anchorRunnable.isRunning());
+                telemetry.update();
+            }
+
         }
 
     }

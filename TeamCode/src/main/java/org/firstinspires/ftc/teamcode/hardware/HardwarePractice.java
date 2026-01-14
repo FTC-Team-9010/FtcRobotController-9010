@@ -64,6 +64,7 @@ public class HardwarePractice {
         flywheel.setDirection(DcMotorSimple.Direction.FORWARD);
 
         arm = hwMap.get(Servo.class, "arm");
+        arm.setDirection(Servo.Direction.REVERSE);
 
         launcher.setVelocity(0);
 
@@ -101,11 +102,11 @@ public class HardwarePractice {
     }
 
     public void armInit() {
-        arm.setPosition(0);
-    }
-
-    public void armLaunch() {
         arm.setPosition(1);
+    }
+ 
+    public void armLaunch() {
+        arm.setPosition(.1);
     }
 
 }

@@ -19,6 +19,7 @@ public class PracticeDriver extends LinearOpMode {
         hdw = new HardwarePractice(hardwareMap, telemetry); //init hardware
         hdw.createHardware();
         robotWheel = new MecanumWheels2023();
+        hdw.armInit();
 
         telemetry.addData("[>]", "All set?");
         telemetry.update();
@@ -32,8 +33,6 @@ public class PracticeDriver extends LinearOpMode {
         Gamepad previousGamePad1 = new Gamepad();
 
         currentGamePad1.copy(gamepad1);
-
-        hdw.armInit();
 
         //This is the main loop of operation.
         while (opModeIsActive()) {

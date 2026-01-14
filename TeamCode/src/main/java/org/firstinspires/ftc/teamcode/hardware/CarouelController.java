@@ -87,7 +87,7 @@ public class CarouelController {
 
     public void raiseLever ( ) {
         // Non-cube bot setting lanchLever.setPosition(0.3);
-        lanchLever.setPosition(.3);
+        lanchLever.setPosition(.25);
     }
 
     public void lowerLever() {
@@ -168,7 +168,7 @@ public class CarouelController {
 
         launcher = hardwareMap.get(DcMotorEx.class,"launcher");
         launcher.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        launcher.setDirection(DcMotorSimple.Direction.REVERSE);
+        launcher.setDirection(DcMotorSimple.Direction.FORWARD);
 
         lanchLever = hardwareMap.get(Servo.class,"launchLever");
         lanchLever.setPosition(leverLowPosition);
