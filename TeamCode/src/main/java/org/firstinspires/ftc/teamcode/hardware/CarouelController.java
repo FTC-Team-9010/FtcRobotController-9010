@@ -300,6 +300,20 @@ public class CarouelController {
         tel.update();
     }
 
+    public void rotateNudgeCW() {
+        int startPosition = carouel.getCurrentPosition();
+        int targetPosition = carouel.getCurrentPosition() + 20;
+        moveToPosition(targetPosition, 3);
+    }
+
+    public void rotateNudgeCCW() {
+        int startPosition = carouel.getCurrentPosition();
+        int targetPosition = carouel.getCurrentPosition() - 20;
+        moveToPosition(targetPosition, 3);
+    }
+
+
+
     /**
      * Move to position by motor encoder click.
      *

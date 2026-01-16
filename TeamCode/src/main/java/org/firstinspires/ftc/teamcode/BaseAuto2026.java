@@ -32,10 +32,10 @@ abstract public class BaseAuto2026 extends LinearOpMode {
 
         waitForStart();
         telemetry.clearAll();
-        //moveToReadPosition();
-        //greenIndex = hdw.readGreenIndex();
-        //moveToShootingPosition();
-        //car.shootPattern(greenIndex);
+        moveToReadPosition();
+        greenIndex = hdw.readGreenIndex();
+        moveToShootingPosition();
+        car.shootPattern(greenIndex);
         hdw.moveToXYPosition(0, 500, 0);
 
     }

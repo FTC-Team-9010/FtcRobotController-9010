@@ -112,9 +112,11 @@ public abstract class GeneralDriver2026 extends LinearOpMode {
             }
 
             if (!previousGamePad1.left_stick_button && currentGamePad1.left_stick_button) {
+
                 car.shootBall();
                 sleep(500);
                 autoLaunchPower = 0;
+
             }
 
             if (!previousGamePad1.dpad_left && currentGamePad1.dpad_left){

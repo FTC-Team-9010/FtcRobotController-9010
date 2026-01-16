@@ -23,7 +23,7 @@ public class RedAuto extends  BaseAuto2026 {
     void moveToShootingPosition() {
         try {
             hdw.moveToXYPosition(0,0,-45 );
-            hdw.moveByAprilTag(tagId,1500);
+            hdw.moveByAprilTag(tagId,1900);
 
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
