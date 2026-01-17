@@ -36,7 +36,7 @@ abstract public class BaseAuto2026 extends LinearOpMode {
         greenIndex = hdw.readGreenIndex();
         moveToShootingPosition();
         car.shootPattern(greenIndex);
-        hdw.moveToXYPosition(0, 500, 0);
+        hdw.moveToXYPosition(-1500, 0, 0);
 
     }
 }

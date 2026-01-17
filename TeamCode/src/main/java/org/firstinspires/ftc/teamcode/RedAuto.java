@@ -11,7 +11,7 @@ public class RedAuto extends  BaseAuto2026 {
     @Override
     void moveToReadPosition() {
         try {
-            hdw.moveToXYPosition(-1200,0,0 );
+            hdw.moveToXYPosition(800,-1500,0 );
 
         } catch (InterruptedException e) {
             throw new RuntimeException(e);

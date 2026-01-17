@@ -160,6 +160,6 @@ public abstract class GeneralDriver2026 extends LinearOpMode {
             }
 
         }
-
+        anchorThread.join();
     }
 }

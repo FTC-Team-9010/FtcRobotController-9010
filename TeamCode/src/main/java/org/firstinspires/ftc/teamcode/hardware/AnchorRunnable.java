@@ -31,9 +31,9 @@ public class AnchorRunnable implements  Runnable{
 
     @Override
     public void run() {
-        while (opMode.opModeIsActive()) {
+        while (opMode.opModeIsActive() ) {
             while (this.running) {
-                Log.d("9010","Running Anchor");
+                Log.d("9010", "Running Anchor");
                 hdw.wheelFrontLeft.setVelocity(0);
                 hdw.wheelBackLeft.setVelocity(0);
                 hdw.wheelFrontRight.setVelocity(0);
@@ -84,7 +84,7 @@ public class AnchorRunnable implements  Runnable{
                 turnPidfCrtler.setTolerance(0.2);
                 turnPidfCrtler.setIntegrationBounds(-1, 1);
 
-                while (running) {
+                while (running && opMode.opModeIsActive()) {
                     //Get Odo meter reading
                     hdw.odo.bulkUpdate();
                     while (hdw.odo.getDeviceStatus() != GoBildaPinpointDriver.DeviceStatus.READY) {
@@ -148,8 +148,8 @@ public class AnchorRunnable implements  Runnable{
                 hdw.wheelFrontRight.setVelocity(0);
                 hdw.wheelBackRight.setVelocity(0);
                 Log.d("9010", "After Stop wheels");
-
             }
         }
+        Log.d("9010","Thread run completed");
     }
 }
