@@ -11,7 +11,7 @@ public class BlueAuto extends BaseAuto2026{
     @Override
     void moveToReadPosition() {
         try {
-            hdw.moveToXYPosition(800,1500,0 );
+            hdw.moveToXYPosition(0,600,-45 );
 
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
@@ -22,8 +22,9 @@ public class BlueAuto extends BaseAuto2026{
     @Override
     void moveToShootingPosition() {
         try {
-            hdw.moveToXYPosition(0,0,45 );
-            hdw.moveByAprilTag(tagId,1900);
+            hdw.moveToXYPosition(0,0,90 );
+            hdw.moveToXYPosition(600, 0, 0);
+            hdw.moveByAprilTag(tagId,1400);
 
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
@@ -32,11 +33,7 @@ public class BlueAuto extends BaseAuto2026{
 
     @Override
     void movePark() {
-        try {
-            hdw.moveToXYPosition(0, -909, 0);
-        } catch (InterruptedException e ) {
-            throw new RuntimeException(e);
-        }
+
     }
 
 

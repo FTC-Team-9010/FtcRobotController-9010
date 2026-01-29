@@ -67,7 +67,7 @@ public abstract class GeneralDriver2026 extends LinearOpMode {
 
             hdw.setIntakePower(currentGamePad1.left_trigger);
             if ( autoLaunchPower==0 ) {
-                car.setLauncherPower(currentGamePad1.right_trigger);
+                car.setLauncherPower(currentGamePad1.right_trigger * (float) 0.761 );
             }
 
             if (gamepad1.back) {
@@ -106,9 +106,10 @@ public abstract class GeneralDriver2026 extends LinearOpMode {
             }
 
             if (!previousGamePad1.right_stick_button && currentGamePad1.right_stick_button) {
-                autoLaunchPower = 1;
+                autoLaunchPower = (float) 0.76;
                 car.setLauncherPower(autoLaunchPower);
-                hdw.moveByAprilTag(this.targetTagId, 1200);
+                hdw.moveByAprilTag(this.targetTagId, 1400);
+                //TODO Fix possible issue with this method. With motor still running, doesn't see AprilTag
             }
 
             if (!previousGamePad1.left_stick_button && currentGamePad1.left_stick_button) {

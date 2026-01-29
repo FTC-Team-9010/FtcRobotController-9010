@@ -462,6 +462,7 @@ public class CarouelController {
      */
 
     public void shootPattern(int decodedGreenIndex) {
+        setLauncherPower(presetLaunchPower);
         if ( configReadNeeded ) {
             readBallConfiguration();
         }
@@ -474,8 +475,16 @@ public class CarouelController {
                 shootBall();
                 //Log.d("9010", " loop shoot " + ballConfiguration[0] + " " + ballConfiguration[1] + " " + ballConfiguration[2]);
             }
+        } else {
+            Log.d("9010", "Can't read ball pattern, shoot anyway " );
+            shootBall();
+            for (int i = 1; i < 3; i++) {
+                rotateOneSlotCCW();
+                shootBall();
+                //Log.d("9010", " loop shoot " + ballConfiguration[0] + " " + ballConfiguration[1] + " " + ballConfiguration[2]);
+            }
         }
-
+        setLauncherPower(0);
     }
 
 
