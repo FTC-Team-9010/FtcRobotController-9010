@@ -17,6 +17,7 @@ abstract public class BaseAuto2026 extends LinearOpMode {
 
     abstract  void moveToShootingPosition() ;
 
+    abstract  void movePark();
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -36,7 +37,8 @@ abstract public class BaseAuto2026 extends LinearOpMode {
         greenIndex = hdw.readGreenIndex();
         moveToShootingPosition();
         car.shootPattern(greenIndex);
-        hdw.moveToXYPosition(-1500, 0, 0);
+        hdw.moveToXYPosition(800, 0, 0);
+        //movePark();
 
     }
 }

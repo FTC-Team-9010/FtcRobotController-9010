@@ -87,7 +87,7 @@ public class CarouelController {
 
     public void raiseLever ( ) {
         // Non-cube bot setting lanchLever.setPosition(0.3);
-        lanchLever.setPosition(.25);
+        lanchLever.setPosition(.3);
     }
 
     public void lowerLever() {
@@ -217,7 +217,7 @@ public class CarouelController {
         Log.d("9010", "Position after stop: " + currentPosition);
 
         //Move antoher angle for the launch position
-        moveToPosition(currentPosition-72 , 3 );
+        //moveToPosition(currentPosition , 3 );
 
         carouel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         carouel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -488,9 +488,11 @@ public class CarouelController {
         try {
             //Sping launcher
             //setLauncherPower(presetLaunchPower);
+            //rotateNudgeCW();
             raiseLever();
             Thread.sleep(700);
             lowerLever();
+            //rotateNudgeCCW();
             //setLauncherPower(0);
 
             //After shoot ball, position 0 becomes empty

@@ -67,7 +67,7 @@ public abstract class GeneralDriver2026 extends LinearOpMode {
 
             hdw.setIntakePower(currentGamePad1.left_trigger);
             if ( autoLaunchPower==0 ) {
-                car.setLauncherPower(currentGamePad1.right_trigger * (float) 0.95);
+                car.setLauncherPower(currentGamePad1.right_trigger);
             }
 
             if (gamepad1.back) {
@@ -106,9 +106,9 @@ public abstract class GeneralDriver2026 extends LinearOpMode {
             }
 
             if (!previousGamePad1.right_stick_button && currentGamePad1.right_stick_button) {
-                autoLaunchPower = (float) 0.95;
+                autoLaunchPower = 1;
                 car.setLauncherPower(autoLaunchPower);
-                hdw.moveByAprilTag(this.targetTagId, 1900);
+                hdw.moveByAprilTag(this.targetTagId, 1200);
             }
 
             if (!previousGamePad1.left_stick_button && currentGamePad1.left_stick_button) {

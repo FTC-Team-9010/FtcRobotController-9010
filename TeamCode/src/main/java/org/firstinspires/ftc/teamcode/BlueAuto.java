@@ -30,5 +30,14 @@ public class BlueAuto extends BaseAuto2026{
         }
     }
 
+    @Override
+    void movePark() {
+        try {
+            hdw.moveToXYPosition(0, -909, 0);
+        } catch (InterruptedException e ) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
 }

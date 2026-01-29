@@ -32,7 +32,7 @@ public class AnchorRunnable implements  Runnable{
     @Override
     public void run() {
         while (opMode.opModeIsActive() ) {
-            while (this.running) {
+            while (this.running&&opMode.opModeIsActive()) {
                 Log.d("9010", "Running Anchor");
                 hdw.wheelFrontLeft.setVelocity(0);
                 hdw.wheelBackLeft.setVelocity(0);
@@ -142,7 +142,7 @@ public class AnchorRunnable implements  Runnable{
                         + " Y: " + currentPos.getY(DistanceUnit.MM)
                         + " Heading: " + currentPos.getHeading(AngleUnit.DEGREES));
 
-                Log.d("9010", "Before Stop");
+                //Log.d("9010", "Before Stop");
                 hdw.wheelFrontLeft.setVelocity(0);
                 hdw.wheelBackLeft.setVelocity(0);
                 hdw.wheelFrontRight.setVelocity(0);

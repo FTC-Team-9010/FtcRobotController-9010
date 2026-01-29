@@ -16,7 +16,6 @@ public class RedAuto extends  BaseAuto2026 {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        return;
     }
 
     @Override
@@ -29,4 +28,14 @@ public class RedAuto extends  BaseAuto2026 {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    void movePark() {
+        try {
+            hdw.moveToXYPosition(0, 909, 0);
+        } catch (InterruptedException e ) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }
