@@ -68,7 +68,7 @@ public class CarouelController {
     private DcMotor launcher = null;
     private float launcherPower = 0;
 
-    public float presetLaunchPower = (float) 1 ;
+    public float presetLaunchPower = (float) 0.761 ;
     private Servo lanchLever = null;
     //Non-cube bot private final float leverLowPosition =(float) 1;
     private final float leverLowPosition = (float) 0.0;

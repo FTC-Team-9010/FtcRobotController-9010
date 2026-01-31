@@ -68,7 +68,7 @@ public abstract class GeneralDriver2026 extends LinearOpMode {
             hdw.setIntakePower(currentGamePad1.left_trigger);
 
             if ( autoLaunchPower==0 ) {
-                car.setLauncherPower(currentGamePad1.right_trigger * (float) 0.761 );
+                car.setLauncherPower(currentGamePad1.right_trigger * car.presetLaunchPower );
             }
 
             if (gamepad1.back) {
@@ -107,9 +107,9 @@ public abstract class GeneralDriver2026 extends LinearOpMode {
             }
 
             if (!previousGamePad1.right_stick_button && currentGamePad1.right_stick_button) {
-                autoLaunchPower = (float) 0.76;
+                autoLaunchPower = car.presetLaunchPower;
                 car.setLauncherPower(autoLaunchPower);
-                hdw.moveByAprilTag(this.targetTagId, 1400);
+                hdw.moveByAprilTag(this.targetTagId, hdw.shootingRange);
                 //TODO Fix possible issue with this method. With motor still running, doesn't see AprilTag
             }
 
@@ -132,7 +132,7 @@ public abstract class GeneralDriver2026 extends LinearOpMode {
             }
             if (!previousGamePad1.dpad_down && currentGamePad1.dpad_down) {
                 car.shootPattern(greenIndex);
-                sleep(500);
+                //sleep(500);
                 autoLaunchPower = 0;
             }
 

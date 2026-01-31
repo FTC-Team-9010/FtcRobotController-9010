@@ -23,7 +23,7 @@ public class BlueFarAuto extends BaseAuto2026{
     void moveToShootingPosition() {
         try {
             hdw.moveToXYPosition(0,0,45 );
-            hdw.moveByAprilTag(tagId,1400);
+            hdw.moveByAprilTag(tagId,hdw.shootingRange);
 
         } catch (InterruptedException e) {
             throw new RuntimeException(e);

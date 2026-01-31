@@ -24,7 +24,7 @@ public class BlueAuto extends BaseAuto2026{
         try {
             hdw.moveToXYPosition(0,0,90 );
             hdw.moveToXYPosition(600, 0, 0);
-            hdw.moveByAprilTag(tagId,1400);
+            hdw.moveByAprilTag(tagId,hdw.shootingRange);
 
         } catch (InterruptedException e) {
             throw new RuntimeException(e);

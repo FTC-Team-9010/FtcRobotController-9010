@@ -66,6 +66,8 @@ public class Hardware2026 {
         telemetry = tm;
     }
 
+    public  float shootingRange = 1400;
+
     public double getTurnKP() {
         return turnKP;
     }
