@@ -219,7 +219,7 @@ public class Hardware2026 {
             // Access fiducial results
             List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
             for (LLResultTypes.FiducialResult fr : fiducialResults) {
-                greenIndex = fr.getFiducialId() - 20;
+                greenIndex = fr.getFiducialId() - 21;
             }
         }
         return greenIndex;

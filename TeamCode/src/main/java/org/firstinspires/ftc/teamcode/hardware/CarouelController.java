@@ -391,9 +391,9 @@ public class CarouelController {
      */
 
     public void readBallConfiguration() {
-        for (int i = 0; i < 3; i++) {
-            float color = this.getHsv(i);
-            Log.d("9010", "Color value: " + color);
+        for (int i = 0; i < 2; i++) {
+            float color = getHsv(i);
+            Log.d("9010", "Color value of sensor [" + i + "]: " + color);
             if (color > 200) {
                 ballConfiguration[i] = PURPLE;
             } else if (color <= 200 && color > 0) {
@@ -401,10 +401,26 @@ public class CarouelController {
             } else if (color == 0) {
                 ballConfiguration[i] = EMPTY;
             }
-            tel.addData("Ball Config: [" , ballConfiguration[0] + "] [" +
-                    ballConfiguration[1] + "] ["+ ballConfiguration[2]+"]");
-            tel.update();
+
         }
+        rotateOneSlotCW(); // Now slot 2 is at 0 position
+        float colorR = getHsv(0);
+        Log.d("9010", "Color value of sensor after rotation: " + colorR);
+        rotateOneSlotCCW();
+        if (colorR > 200) {
+            ballConfiguration[2] = PURPLE;
+        } else if (colorR <= 200 && colorR > 0) {
+            ballConfiguration[2] = GREEN;
+        } else if (colorR == 0) {
+            ballConfiguration[2] = EMPTY;
+        }
+        tel.addData("Ball Config: [" , ballConfiguration[0] + "] [" +
+                ballConfiguration[1] + "] ["+ ballConfiguration[2]+"]");
+        tel.update();
+        Log.d("9010", "Ball Config: [" + ballConfiguration[0] + "] [" +
+                ballConfiguration[1] + "] ["+ ballConfiguration[2] +"]");
+
+
         if (ballConfiguration[0] + ballConfiguration[1]+ ballConfiguration[2] ==0 ){
             configReadNeeded = true;
         } else {
@@ -484,6 +500,11 @@ public class CarouelController {
                 //Log.d("9010", " loop shoot " + ballConfiguration[0] + " " + ballConfiguration[1] + " " + ballConfiguration[2]);
             }
         }
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            Log.e("9010", "Error on Thread.Sleep ");
+        }
         setLauncherPower(0);
     }
 
@@ -518,7 +539,8 @@ public class CarouelController {
             tel.update();
 
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+
+            Log.e("9010", "Error on Thread.Sleep ");
         }
     }
 

@@ -36,5 +36,26 @@ public class BlueAuto extends BaseAuto2026{
 
     }
 
+    @Override
+    void moveToIntake() {
+        try {
+            hdw.moveByAprilTag(tagId, 1600);
+            hdw.moveToXYPosition(0,0, -135);
+            hdw.moveToXYPosition(700, 0, 0);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    void moveAfterShoot() {
+        try {
+            hdw.moveToXYPosition(-400, -700, 45);
+            hdw.moveByAprilTag(tagId,1400);
+
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 }

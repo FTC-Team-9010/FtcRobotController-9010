@@ -66,6 +66,7 @@ public abstract class GeneralDriver2026 extends LinearOpMode {
             hdw.wheelBackRight.setVelocity(robotWheel.wheelBackRightPower * Hardware2026.ANGULAR_RATE);
 
             hdw.setIntakePower(currentGamePad1.left_trigger);
+
             if ( autoLaunchPower==0 ) {
                 car.setLauncherPower(currentGamePad1.right_trigger * (float) 0.761 );
             }

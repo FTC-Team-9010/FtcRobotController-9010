@@ -1,29 +1,28 @@
 package org.firstinspires.ftc.teamcode;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous(name = "RedAuto")
-public class RedAuto extends BaseAuto2026 {
-
-    //TODO: Mirror values from BlueFarAuto
-    public RedAuto() {
-        tagId = 24 ;
+@Autonomous(name = "RedFarAuto")
+public class RedFarAuto extends BaseAuto2026{
+    public RedFarAuto() {
+        tagId = 24;
     }
 
     @Override
     void moveToReadPosition() {
         try {
-            hdw.moveToXYPosition(0,-600,45 );
+            hdw.moveToXYPosition(-1600,-200, 0);
 
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+        return;
     }
 
     @Override
     void moveToShootingPosition() {
         try {
-            hdw.moveToXYPosition(0,0,-90 );
-            hdw.moveToXYPosition(600, 0, 0);
+            hdw.moveToXYPosition(0,0,-45 );
             hdw.moveByAprilTag(tagId,1400);
 
         } catch (InterruptedException e) {
@@ -57,6 +56,5 @@ public class RedAuto extends BaseAuto2026 {
             throw new RuntimeException(e);
         }
     }
-
 
 }

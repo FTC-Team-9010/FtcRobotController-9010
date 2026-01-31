@@ -19,6 +19,25 @@ abstract public class BaseAuto2026 extends LinearOpMode {
 
     abstract  void movePark();
 
+    abstract void moveToIntake();
+
+    abstract  void moveAfterShoot();
+
+    void intakeSequence() {
+        try {
+            hdw.setIntakePower(1);
+            hdw.moveToXYPosition(140, 0, 0);
+            car.rotateOneSlotCW();
+            hdw.moveToXYPosition(140, 0, 0);
+            car.rotateOneSlotCW();
+            hdw.moveToXYPosition(140, 0, 0);
+            hdw.setIntakePower(0);
+
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public void runOpMode() throws InterruptedException {
         car = new CarouelController(hardwareMap, telemetry);
@@ -35,11 +54,16 @@ abstract public class BaseAuto2026 extends LinearOpMode {
         telemetry.clearAll();
         moveToReadPosition();
         greenIndex = hdw.readGreenIndex();
-        telemetry.addData("Green Index Read: ",greenIndex);
+        telemetry.addData("Green Index Read: ", greenIndex);
         telemetry.update();
         moveToShootingPosition();
         car.shootPattern(greenIndex);
-        movePark();
+        //movePark();
+        //moveToIntake();
+        //intakeSequence();
+        //moveAfterShoot();
+        //car.shootPattern(greenIndex);
 
     }
+
 }
