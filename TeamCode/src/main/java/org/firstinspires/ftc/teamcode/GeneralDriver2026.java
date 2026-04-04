@@ -72,7 +72,7 @@ public abstract class GeneralDriver2026 extends LinearOpMode {
             }
 
             if (gamepad1.back) {
-                car.initPosition();
+                //car.initPosition();
             }
             if (!previousGamePad1.ps && currentGamePad1.ps) {
                 robotWheel.setHeadingForward(!robotWheel.isHeadingForward());
@@ -125,7 +125,7 @@ public abstract class GeneralDriver2026 extends LinearOpMode {
             }
 
             if (!previousGamePad1.dpad_left && currentGamePad1.dpad_left){
-                car.rotateOneSlotCCW();
+                //car.rotateOneSlotCCW();
             }
             if (!previousGamePad1.dpad_right && currentGamePad1.dpad_right) {
                 car.rotateOneSlotCW();
@@ -134,18 +134,20 @@ public abstract class GeneralDriver2026 extends LinearOpMode {
 
             }
             if (!previousGamePad1.dpad_down && currentGamePad1.dpad_down) {
-
+                car.shootPattern(1);
+                autoLaunchPower = 0;
             }
 
             if (!previousGamePad1.left_bumper && currentGamePad1.left_bumper){
                 //Shooting green ball
-                car.shootGreen();
+                //car.shootGreen();
             }
             if (!previousGamePad1.right_bumper && currentGamePad1.right_bumper) {
                 //Shooting purple ball
-                car.shootPurple();
+                //car.shootPurple();
             }
 
+            /*
             if( gamepad2.y) {
                 greenIndex = 0;
                 telemetry.addLine().addData("Pattern : G P P",anchorRunnable.isRunning());
@@ -161,6 +163,8 @@ public abstract class GeneralDriver2026 extends LinearOpMode {
                 telemetry.addLine().addData("Pattern : P P G",anchorRunnable.isRunning());
                 telemetry.update();
             }
+
+             */
 
         }
         anchorThread.join();
