@@ -81,10 +81,13 @@ public abstract class GeneralDriver2026 extends LinearOpMode {
             }
 
             if (!previousGamePad1.x && currentGamePad1.x) {
+                //car.shootPattern(greenIndex);
 
             }
 
             if (!previousGamePad1.y && currentGamePad1.y) {
+                //autoLaunchPower = 0;
+                //car.readBallConfiguration();
             }
 
 
@@ -128,12 +131,10 @@ public abstract class GeneralDriver2026 extends LinearOpMode {
                 car.rotateOneSlotCW();
             }
             if (!previousGamePad1.dpad_up && currentGamePad1.dpad_up) {
-                car.readBallConfiguration();
+
             }
             if (!previousGamePad1.dpad_down && currentGamePad1.dpad_down) {
-                car.shootPattern(greenIndex);
-                //sleep(500);
-                autoLaunchPower = 0;
+
             }
 
             if (!previousGamePad1.left_bumper && currentGamePad1.left_bumper){

@@ -1,41 +1,32 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-@Autonomous(name = "Move/ParkAuto")
-public class ParkAuto extends BaseAuto2026{
-    public ParkAuto() {
-        tagId = 20;
-    }
+import org.firstinspires.ftc.teamcode.hardware.CarouelController;
+import org.firstinspires.ftc.teamcode.hardware.Hardware2026;
 
-    @Override
-    void moveToReadPosition() {
+@Autonomous(name = "ParkAuto")
+public class ParkAuto extends LinearOpMode {
 
-    }
-
-    @Override
-    void moveToShootingPosition() {
-
-    }
+    Hardware2026 hdw;
+    CarouelController car;
 
     @Override
-    void movePark() {
-        try {
-            hdw.moveToXYPosition(400, 0, 0);
+    public void runOpMode() throws InterruptedException {
+        car = new CarouelController(hardwareMap, telemetry);
+        car.initialize();
 
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        hdw = new Hardware2026(hardwareMap, telemetry); //init hardware
+        hdw.createHardware();
+
+        telemetry.addData("[>]", "All set?");
+        telemetry.update();
+        //car.initPosition();
+
+        waitForStart();
+        telemetry.clearAll();
+        hdw.moveToXYPosition(800,0,0);
+
     }
-
-    @Override
-    void moveToIntake() {
-
-    }
-
-    @Override
-    void moveAfterShoot() {
-
-         }
-
 }
