@@ -38,7 +38,7 @@ public class CarouelController {
     private final int PURPLE = 1;
     private final int EMPTY = 0;
 
-    private final int Car_Angular_Rate = 150;
+    private final int Car_Angular_Rate = 2000;
 
     /**
      * Flag to show if a read of config is necessary.
@@ -503,14 +503,15 @@ public class CarouelController {
 
         Log.d("9010", "Can't read ball pattern, shoot anyway " );
         shootBall();
-        for (int i = 1; i < 3; i++) {
-            rotateOneSlotCCW();
-            shootBall();
-            //Log.d("9010", " loop shoot " + ballConfiguration[0] + " " + ballConfiguration[1] + " " + ballConfiguration[2]);
+        try {
+
+            for (int i = 1; i < 3; i++) {
+                Thread.sleep(300);
+                rotateOneSlotCCW();
+                shootBall();
             }
 
-        try {
-            Thread.sleep(1000);
+            Thread.sleep(500);
         } catch (InterruptedException e) {
             Log.e("9010", "Error on Thread.Sleep ");
         }
