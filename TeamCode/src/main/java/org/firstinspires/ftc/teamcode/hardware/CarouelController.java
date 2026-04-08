@@ -38,6 +38,8 @@ public class CarouelController {
     private final int PURPLE = 1;
     private final int EMPTY = 0;
 
+    private final int Car_Angular_Rate = 150;
+
     /**
      * Flag to show if a read of config is necessary.
      * 1. All 3 are empty.
@@ -65,7 +67,7 @@ public class CarouelController {
 
     NormalizedColorSensor[] colorSensors = new NormalizedColorSensor[3];
 
-    private DcMotor launcher = null;
+    private DcMotorEx launcher = null;
     private float launcherPower = 0;
 
     public float presetLaunchPower = (float) 0.761 ;
@@ -82,7 +84,7 @@ public class CarouelController {
 
     public void setLauncherPower (float power ) {
         launcherPower=power;
-        launcher.setPower(power);
+        launcher.setVelocity(power * Car_Angular_Rate);
     }
 
     public void raiseLever ( ) {
@@ -167,7 +169,7 @@ public class CarouelController {
         meg = hardwareMap.get(RevTouchSensor.class, "meg");
 
         launcher = hardwareMap.get(DcMotorEx.class,"launcher");
-        launcher.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        launcher.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         launcher.setDirection(DcMotorSimple.Direction.FORWARD);
 
         lanchLever = hardwareMap.get(Servo.class,"launchLever");

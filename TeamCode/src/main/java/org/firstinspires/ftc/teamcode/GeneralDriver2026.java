@@ -74,6 +74,8 @@ public abstract class GeneralDriver2026 extends LinearOpMode {
             if (gamepad1.back) {
                 //car.initPosition();
             }
+
+
             if (!previousGamePad1.ps && currentGamePad1.ps) {
                 robotWheel.setHeadingForward(!robotWheel.isHeadingForward());
                 telemetry.addLine().addData("Heading Foward: ", robotWheel.isHeadingForward());
@@ -125,7 +127,7 @@ public abstract class GeneralDriver2026 extends LinearOpMode {
             }
 
             if (!previousGamePad1.dpad_left && currentGamePad1.dpad_left){
-                //car.rotateOneSlotCCW();
+                car.rotateOneSlotCW();
             }
             if (!previousGamePad1.dpad_right && currentGamePad1.dpad_right) {
                 car.rotateOneSlotCW();
