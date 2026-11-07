@@ -47,10 +47,10 @@ public class GeneralDriver2027 extends LinearOpMode {
 
             robotWheel.joystick(gamepad1, turbo);
 
-            hdw.wheelFrontLeft.setVelocity(robotWheel.wheelFrontLeftPower * Hardware2026.ANGULAR_RATE);
-            hdw.wheelBackLeft.setVelocity(robotWheel.wheelBackLeftPower * Hardware2026.ANGULAR_RATE);
-            hdw.wheelFrontRight.setVelocity(robotWheel.wheelFrontRightPower * Hardware2026.ANGULAR_RATE);
-            hdw.wheelBackRight.setVelocity(robotWheel.wheelBackRightPower * Hardware2026.ANGULAR_RATE);
+            hdw.wheelFrontLeft.setVelocity(robotWheel.wheelFrontLeftPower * Hardware2027.ANGULAR_RATE);
+            hdw.wheelBackLeft.setVelocity(robotWheel.wheelBackLeftPower * Hardware2027.ANGULAR_RATE);
+            hdw.wheelFrontRight.setVelocity(robotWheel.wheelFrontRightPower * Hardware2027.ANGULAR_RATE);
+            hdw.wheelBackRight.setVelocity(robotWheel.wheelBackRightPower * Hardware2027.ANGULAR_RATE);
 
             hdw.setLuncherPower( (float) (currentGamePad1.left_trigger * MAX_LAUNCH_POWER) );
             hdw.setIntakePower(currentGamePad1.right_trigger);
