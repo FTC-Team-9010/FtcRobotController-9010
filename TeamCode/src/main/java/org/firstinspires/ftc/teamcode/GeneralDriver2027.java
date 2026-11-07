@@ -15,7 +15,10 @@ public class GeneralDriver2027 extends LinearOpMode {
     Hardware2027 hdw;
     MecanumWheels2023 robotWheel;
 
-    double turbo = 1;
+    double turbo = 1.0;
+
+    //Set the max power scale.  Max is 1.
+    double MAX_LAUNCH_POWER = 0.8;
 
 
     @Override
@@ -49,7 +52,7 @@ public class GeneralDriver2027 extends LinearOpMode {
             hdw.wheelFrontRight.setVelocity(robotWheel.wheelFrontRightPower * Hardware2026.ANGULAR_RATE);
             hdw.wheelBackRight.setVelocity(robotWheel.wheelBackRightPower * Hardware2026.ANGULAR_RATE);
 
-            hdw.setLuncherPower(currentGamePad1.left_trigger);
+            hdw.setLuncherPower( (float) (currentGamePad1.left_trigger * MAX_LAUNCH_POWER) );
             hdw.setIntakePower(currentGamePad1.right_trigger);
 
             if (!previousGamePad1.left_bumper && currentGamePad1.left_bumper) {
